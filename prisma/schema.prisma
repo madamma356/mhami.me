@@ -1,0 +1,167 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// NextAuth default models
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  role          Role      @default(USER) // Custom field for Mhami admin
+  profileData   String?   @db.Text       // JSON string storing full user profile (dob, phone, etc)
+  accounts      Account[]
+  sessions      Session[]
+  orders        Order[]   // Orders belonging to the user
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+// Custom Models for Mhami Tarot Platform
+
+model Order {
+  id            String    @id @default(cuid())
+  orderNumber   String    @unique // e.g., "ORD-001"
+  userId        String
+  type          OrderType
+  status        OrderStatus @default(PENDING)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // The specific questions the user asks (used for 3-question reading)
+  questions     String[]  @default([])
+  
+  // Pricing and Coupons
+  pricePaid       Int       @default(0)
+  discountApplied Int       @default(0)
+  couponCode      String?
+  
+  // Payment and Contact
+  slipUrl         String?   @db.Text
+  slipStatus      String    @default("unchecked") // "unchecked", "passed", "failed"
+  contactInfo     String?
+  metadata        String?   @db.Text // JSON string of customer profile
+  
+  // Relations
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  readings      Reading[] 
+}
+
+enum OrderType {
+  THREE_QUESTIONS // 3 questions (ORD-001)
+  PHROM_YAN       // 12 cards Phrom Yan (ORD-002)
+  CHANGE_DESTINY  // Change destiny service
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  REJECTED
+}
+
+model Reading {
+  id            String    @id @default(cuid())
+  orderId       String
+  
+  // Which specific part of the order this reading belongs to.
+  // For PHROM_YAN, it's position 0 (overall).
+  // For THREE_QUESTIONS, it's question 1, 2, 3, or 0 (for extra rant).
+  position      Int       @default(0) 
+  
+  // The card IDs drawn for this reading component.
+  // PHROM_YAN: usually 12 cards.
+  // THREE_QUESTIONS: 3 cards per question.
+  cards         Int[]     
+  
+  // The written prediction by the admin
+  prediction    String    @db.Text
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  order         Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  @@unique([orderId, position])
+}
+
+model Coupon {
+  id            String    @id @default(cuid())
+  code          String    @unique // e.g. "MHAMILAUNCH"
+  discount      Int       // Discount amount or percentage
+  discountType  DiscountType @default(FIXED)
+  isActive      Boolean   @default(true)
+  usedCount     Int       @default(0)
+  maxUses       Int?      // Optional maximum number of uses
+  expiresAt     DateTime? // Optional expiration date
+  createdAt     DateTime  @default(now())
+}
+
+enum DiscountType {
+  FIXED
+  PERCENTAGE
+}
+
+model Blog {
+  id        String   @id @default(cuid())
+  title     String
+  slug      String   @unique
+  content   String   @db.Text
+  imageUrl  String?  @db.Text
+  status    String   @default("published")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Meme {
+  id        String   @id @default(cuid())
+  text      String   @db.Text
+  tags      String
+  imageUrl  String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
