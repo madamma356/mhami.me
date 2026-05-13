@@ -3,16 +3,14 @@
 import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 
 export default function MemberLogin() {
   const router = useRouter();
 
   const handleLineLogin = (e: React.MouseEvent) => {
     e.preventDefault();
-    // For mockup purposes, we simulate a login delay and redirect to the dashboard
-    setTimeout(() => {
-      router.push('/member');
-    }, 800);
+    signIn('line', { callbackUrl: '/member' });
   };
 
   return (
