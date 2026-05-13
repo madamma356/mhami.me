@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import { getAdminOrders, updateAdminPrediction, updateOrderStatus, uploadAdminPdf } from '@/app/actions/admin';
 
 const mockOrders = [
@@ -121,10 +121,10 @@ export default function AdminDashboard() {
     }
   }, [router, session, status]);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     localStorage.removeItem('mhami_is_admin');
     window.dispatchEvent(new Event('auth-change'));
-    router.push('/admin/login');
+    await signOut({ callbackUrl: '/' });
   };
 
   const navItems = [

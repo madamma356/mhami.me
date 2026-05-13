@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { getMemberData, updateMemberProfile } from '@/app/actions/member';
 import { useEffect } from 'react';
-import { useSession } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 
 export default function MemberDashboard() {
   const router = useRouter();
@@ -32,8 +32,8 @@ export default function MemberDashboard() {
     await updateMemberProfile(editForm);
   };
 
-  const handleLogout = () => {
-    router.push('/');
+  const handleLogout = async () => {
+    await signOut({ callbackUrl: '/' });
   };
 
   // Mock Data
