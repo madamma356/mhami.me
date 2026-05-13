@@ -13,12 +13,12 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 export async function getMemberData() {
   try {
     const session = await getServerSession(authOptions);
-    if (!session || !session.user || !(session.user as any).id) {
+    if (!session || !session.user || !session.user.email) {
       return { user: null, orders: [] };
     }
 
     const dbUser = await prisma.user.findUnique({
-      where: { id: (session.user as any).id },
+      where: { email: session.user.email },
       include: {
         orders: {
           include: { readings: true },
@@ -87,12 +87,12 @@ export async function getMemberData() {
 export async function updateMemberProfile(data: any) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session || !session.user || !(session.user as any).id) {
+    if (!session || !session.user || !session.user.email) {
       throw new Error("Not authenticated");
     }
 
     await prisma.user.update({
-      where: { id: (session.user as any).id },
+      where: { email: session.user.email },
       data: {
         name: data.name,
         profileData: JSON.stringify(data)

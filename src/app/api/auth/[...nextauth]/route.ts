@@ -1,10 +1,8 @@
 import NextAuth, { NextAuthOptions } from "next-auth"
 import LineProvider from "next-auth/providers/line"
-import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import { prisma } from "@/lib/prisma"
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
   providers: [
     LineProvider({
       clientId: process.env.LINE_CLIENT_ID || "",
@@ -30,17 +28,42 @@ export const authOptions: NextAuthOptions = {
   },
   session: { strategy: "jwt" },
   callbacks: {
-    async jwt({ token, user }) {
+    async signIn({ user, profile }) {
+      try {
+        const lineId = profile?.sub || user.id;
+        if (lineId) {
+          // Manually upsert user to database, bypassing NextAuth strict Adapter rules
+          await prisma.user.upsert({
+            where: { email: `${lineId}@line.dummy` },
+            create: {
+              name: user.name || "คุณลูกค้า",
+              email: `${lineId}@line.dummy`,
+              image: user.image || "",
+            },
+            update: {
+              name: user.name || "คุณลูกค้า",
+              image: user.image || "",
+            }
+          });
+        }
+      } catch (error) {
+        console.error("DB Upsert Error:", error);
+      }
+      return true;
+    },
+    async jwt({ token, user, profile }) {
       if (user) {
-        token.id = user.id;
-        token.role = (user as any).role;
+        const lineId = profile?.sub || user.id;
+        token.id = lineId;
+        token.email = `${lineId}@line.dummy`;
+        token.role = "USER";
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user && token) {
         (session.user as any).id = token.id;
-        (session.user as any).role = token.role;
+        session.user.email = token.email as string;
       }
       return session;
     }
