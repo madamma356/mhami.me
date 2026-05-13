@@ -5,9 +5,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { getMemberData, updateMemberProfile } from '@/app/actions/member';
 import { useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 
 export default function MemberDashboard() {
   const router = useRouter();
+  const { data: session, status } = useSession();
   
   // Mock User State
   const [user, setUser] = useState({
@@ -37,6 +39,14 @@ export default function MemberDashboard() {
   // Mock Data
   const [activeOrders, setActiveOrders] = useState<any[]>([]);
   const [pastReadings, setPastReadings] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/member/login');
+    } else if (session?.user && (session.user as any).role === 'ADMIN') {
+      router.push('/admin');
+    }
+  }, [status, session, router]);
 
   useEffect(() => {
     const fetchMemberData = async () => {
