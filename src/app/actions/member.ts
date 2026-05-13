@@ -13,19 +13,59 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 export async function getMemberData() {
   try {
     const session = await getServerSession(authOptions);
-    if (!session || !session.user || !session.user.email) {
+    const sessionUser = session.user as any;
+    const sessionEmail = session.user.email;
+    const sessionId = sessionUser.id;
+
+    if (!sessionEmail && !sessionId) {
       return { user: null, orders: [] };
     }
 
-    const dbUser = await prisma.user.findUnique({
-      where: { email: session.user.email },
-      include: {
-        orders: {
-          include: { readings: true },
-          orderBy: { createdAt: 'desc' }
+    let dbUser = null;
+
+    // 1. Try to find by email (for new manual upserts)
+    if (sessionEmail) {
+      dbUser = await prisma.user.findUnique({
+        where: { email: sessionEmail },
+        include: {
+          orders: {
+            include: { readings: true },
+            orderBy: { createdAt: 'desc' }
+          }
         }
-      }
-    });
+      });
+    }
+
+    // 2. Try to find by ID (for old PrismaAdapter tokens where ID is CUID)
+    if (!dbUser && sessionId) {
+      dbUser = await prisma.user.findUnique({
+        where: { id: sessionId },
+        include: {
+          orders: {
+            include: { readings: true },
+            orderBy: { createdAt: 'desc' }
+          }
+        }
+      });
+    }
+
+    // 3. Try to find by Account providerAccountId (if sessionId is LINE ID)
+    if (!dbUser && sessionId) {
+      const account = await prisma.account.findFirst({
+        where: { provider: 'line', providerAccountId: sessionId },
+        include: {
+          user: {
+            include: {
+              orders: {
+                include: { readings: true },
+                orderBy: { createdAt: 'desc' }
+              }
+            }
+          }
+        }
+      });
+      if (account) dbUser = account.user;
+    }
 
     if (!dbUser) {
       return { user: null, orders: [] };
@@ -87,12 +127,32 @@ export async function getMemberData() {
 export async function updateMemberProfile(data: any) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session || !session.user || !session.user.email) {
+    const sessionUser = session.user as any;
+    const sessionEmail = session.user.email;
+    const sessionId = sessionUser.id;
+
+    if (!sessionEmail && !sessionId) {
       throw new Error("Not authenticated");
     }
 
+    let userIdToUpdate = sessionId;
+
+    // Find the correct User ID
+    if (sessionEmail) {
+      const u = await prisma.user.findUnique({ where: { email: sessionEmail } });
+      if (u) userIdToUpdate = u.id;
+    }
+    
+    if (!userIdToUpdate || userIdToUpdate.startsWith('U')) { // If it's a LINE ID
+      const account = await prisma.account.findFirst({
+        where: { provider: 'line', providerAccountId: sessionId },
+        include: { user: true }
+      });
+      if (account) userIdToUpdate = account.user.id;
+    }
+
     await prisma.user.update({
-      where: { email: session.user.email },
+      where: { id: userIdToUpdate },
       data: {
         name: data.name,
         profileData: JSON.stringify(data)
