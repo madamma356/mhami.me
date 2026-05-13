@@ -18,7 +18,7 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   pages: {
-    signIn: '/login', // We might need to create this page, or just use default. Actually, we'll probably trigger login directly from the booking flow. Let's keep it default for now by removing it.
+    signIn: '/member/login',
   },
   session: { strategy: "jwt" },
   callbacks: {

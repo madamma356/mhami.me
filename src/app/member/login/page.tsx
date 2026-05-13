@@ -2,11 +2,14 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
+import { Suspense } from 'react';
 
-export default function MemberLogin() {
+function LoginContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const error = searchParams.get('error');
 
   const handleLineLogin = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -40,9 +43,15 @@ export default function MemberLogin() {
           <h2 style={{ color: 'var(--text-main)', marginBottom: '1rem', fontSize: '2rem', fontFamily: '"Playfair Display", "Noto Serif Thai", serif' }}>
             Your Healing Sanctuary
           </h2>
-          <p style={{ color: 'var(--text-muted)', marginBottom: '3rem', fontSize: '1rem', lineHeight: '1.6' }}>
+          <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', fontSize: '1rem', lineHeight: '1.6' }}>
             เข้าสู่ระบบเพื่อเช็คสถานะคิวคำทำนาย อ่านประวัติย้อนหลัง และจัดการข้อมูลชะตาของคุณ
           </p>
+
+          {error && (
+            <div style={{ backgroundColor: 'rgba(255,0,0,0.1)', border: '1px solid red', padding: '1rem', borderRadius: '0.5rem', marginBottom: '1.5rem', color: 'white' }}>
+              <strong>พบปัญหาการล็อกอิน:</strong> {error}
+            </div>
+          )}
 
           <button 
             onClick={handleLineLogin}
@@ -81,5 +90,13 @@ export default function MemberLogin() {
         © {new Date().getFullYear()} Mystic Matriarch. All rights reserved.
       </footer>
     </div>
+  );
+}
+
+export default function MemberLogin() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginContent />
+    </Suspense>
   );
 }
