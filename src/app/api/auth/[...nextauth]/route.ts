@@ -14,6 +14,14 @@ export const authOptions: NextAuthOptions = {
           scope: 'profile openid',
           bot_prompt: 'aggressive'
         }
+      },
+      profile(profile) {
+        return {
+          id: profile.sub,
+          name: profile.name,
+          email: `${profile.sub}@line.dummy`,
+          image: profile.picture,
+        };
       }
     }),
   ],
