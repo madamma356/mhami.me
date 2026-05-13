@@ -11,7 +11,7 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.LINE_CLIENT_SECRET || "",
       authorization: {
         params: {
-          scope: 'profile openid email',
+          scope: 'profile openid',
           bot_prompt: 'aggressive'
         }
       }
