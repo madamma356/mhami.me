@@ -18,7 +18,7 @@ export async function getMemberData() {
     const sessionId = sessionUser.id;
 
     if (!sessionEmail && !sessionId) {
-      return { user: { name: 'Error: No session email or ID' }, orders: [] };
+      return { user: { name: 'Error: No session email or ID' }, activeOrders: [], pastReadings: [] };
     }
 
     let dbUser = null;
@@ -68,7 +68,7 @@ export async function getMemberData() {
     }
 
     if (!dbUser) {
-      return { user: { name: `Error: User not found in DB. Session ID: ${sessionId}` }, orders: [] };
+      return { user: { name: `Error: User not found in DB. Session ID: ${sessionId}` }, activeOrders: [], pastReadings: [] };
     }
 
     // Parse profile data
@@ -120,7 +120,7 @@ export async function getMemberData() {
 
   } catch (error: any) {
     console.error("Error fetching member data:", error);
-    return { user: { name: `Error: ${error?.message || String(error)}` }, orders: [] };
+    return { user: { name: `Error: ${error?.message || String(error)}` }, activeOrders: [], pastReadings: [] };
   }
 }
 
