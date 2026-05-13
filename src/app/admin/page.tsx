@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { getAdminOrders, updateAdminPrediction, updateOrderStatus, uploadAdminPdf } from '@/app/actions/admin';
 
 const mockOrders = [
@@ -30,6 +31,7 @@ export default function AdminDashboard() {
   const [ordersList, setOrdersList] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const { data: session, status } = useSession();
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -99,15 +101,25 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const isAdmin = localStorage.getItem('mhami_is_admin');
-      if (isAdmin === 'true') {
-        setIsAuthorized(true);
-      } else {
-        router.push('/admin/login');
-      }
+    if (status === 'loading') return;
+
+    let isAuthed = false;
+    
+    // Check NextAuth session first
+    if (session?.user && (session.user as any).role === 'ADMIN') {
+      isAuthed = true;
+    } 
+    // Fallback to old localStorage method
+    else if (typeof window !== 'undefined' && localStorage.getItem('mhami_is_admin') === 'true') {
+      isAuthed = true;
     }
-  }, [router]);
+
+    if (isAuthed) {
+      setIsAuthorized(true);
+    } else {
+      router.push('/admin/login');
+    }
+  }, [router, session, status]);
 
   const handleLogout = () => {
     localStorage.removeItem('mhami_is_admin');
