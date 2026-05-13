@@ -11,12 +11,12 @@ export default function MemberDashboard() {
   
   // Mock User State
   const [user, setUser] = useState({
-    name: 'คุณพลอยปภัส',
-    dob: '15 ตุลาคม 2533',
-    birthTime: '14:30 น.',
-    province: 'กรุงเทพมหานคร',
-    phone: '081-xxx-xxxx',
-    lineId: '@ploypapas123'
+    name: 'กำลังโหลด...',
+    dob: '-',
+    birthTime: '-',
+    province: '-',
+    phone: '-',
+    lineId: '-'
   });
 
   const [isEditing, setIsEditing] = useState(false);
@@ -35,15 +35,8 @@ export default function MemberDashboard() {
   };
 
   // Mock Data
-  const [activeOrders, setActiveOrders] = useState<any[]>([
-    { id: 'MH-10025', service: 'Destiny Rewrite', status: 'กำลังเชื่อมต่อพลังงาน', date: 'วันนี้' }
-  ]);
-
-  const [pastReadings, setPastReadings] = useState<any[]>([
-    { id: 'MH-10023', service: 'Destiny Rewrite', date: '10 พ.ค. 2569', type: 'Blueprint' },
-    { id: 'MH-10022', service: 'Life Unveiled', date: '5 พ.ค. 2569', type: '12 Cards' },
-    { id: 'MH-10024', service: 'Mini Empower', date: '1 พ.ค. 2569', type: '3 Questions' },
-  ]);
+  const [activeOrders, setActiveOrders] = useState<any[]>([]);
+  const [pastReadings, setPastReadings] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchMemberData = async () => {
@@ -53,10 +46,8 @@ export default function MemberDashboard() {
           // If we got real data, update state
           setUser(prev => ({ ...prev, ...data.user }));
           setEditForm(prev => ({ ...prev, ...data.user }));
-          if (data.activeOrders.length > 0 || data.pastReadings.length > 0) {
-            setActiveOrders(data.activeOrders);
-            setPastReadings(data.pastReadings);
-          }
+          setActiveOrders(data.activeOrders);
+          setPastReadings(data.pastReadings);
         }
       } catch (e) {
         // Fallback to mock data on error

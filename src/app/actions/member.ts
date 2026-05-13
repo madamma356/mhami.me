@@ -8,9 +8,11 @@ import { NextAuthOptions } from "next-auth";
 // Since we don't have an authOptions export in lib, we will just use the email.
 // Wait, we can get session.user.email and find the user.
 
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+
 export async function getMemberData() {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     if (!session || !session.user || !session.user.email) {
       return { user: null, orders: [] };
     }
@@ -84,7 +86,7 @@ export async function getMemberData() {
 
 export async function updateMemberProfile(data: any) {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     if (!session || !session.user || !session.user.email) {
       throw new Error("Not authenticated");
     }
