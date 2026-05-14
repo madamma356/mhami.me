@@ -230,27 +230,7 @@ export default function AdminDashboard() {
 
       {/* Main Content Area */}
       <main style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: 'transparent' }}>
-        {/* Header */}
-        <header style={{ 
-          height: '80px', 
-          backgroundColor: 'rgba(26, 24, 22, 0.8)', 
-          borderBottom: '1px solid rgba(214, 180, 124, 0.1)',
-          backdropFilter: 'blur(10px)',
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 3rem'
-        }}>
-          <h2 style={{ color: 'var(--text-main)', fontSize: '1.4rem', fontWeight: 400 }}>
-            {navItems.find(i => i.id === activeTab)?.label || 'Dashboard'}
-          </h2>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-            <i className="fas fa-bell" style={{ color: 'var(--text-muted)', cursor: 'pointer', fontSize: '1.2rem' }}></i>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', background: 'rgba(0,0,0,0.3)', padding: '0.4rem 1.2rem 0.4rem 0.4rem', borderRadius: '2rem', border: '1px solid rgba(214, 180, 124, 0.2)' }}>
-              <img src="/images/profile/ma-profile.jpg" alt="Admin" style={{ width: '35px', height: '35px', borderRadius: '50%', objectFit: 'cover' }} onError={(e) => { e.currentTarget.src = 'https://ui-avatars.com/api/?name=Ma&background=c9a227&color=fff' }} />
-              <span style={{ color: 'var(--primary)', fontSize: '0.9rem' }}>แม่ครูม้า</span>
-            </div>
-          </div>
-        </header>
-
-        {/* Scrollable Content */}
+        {/* Admin Header removed to prevent duplication with Main Navigation */}        {/* Scrollable Content */}
         <div style={{ flex: 1, overflowY: 'auto', padding: '3rem' }}>
           
           {/* TAB: DASHBOARD */}
