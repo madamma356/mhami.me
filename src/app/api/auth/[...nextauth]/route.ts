@@ -3,14 +3,14 @@ import LineProvider from "next-auth/providers/line"
 import { prisma } from "@/lib/prisma"
 
 export const authOptions: NextAuthOptions = {
+  secret: process.env.NEXTAUTH_SECRET || "mhami_super_secret_fallback_key_2026",
   providers: [
     LineProvider({
       clientId: process.env.LINE_CLIENT_ID || "",
       clientSecret: process.env.LINE_CLIENT_SECRET || "",
       authorization: {
         params: {
-          scope: 'profile openid',
-          bot_prompt: 'aggressive'
+          scope: 'profile openid'
         }
       },
       profile(profile) {
@@ -18,7 +18,7 @@ export const authOptions: NextAuthOptions = {
           id: profile.sub,
           name: profile.name,
           email: `${profile.sub}@line.dummy`,
-          image: profile.picture,
+          image: profile.picture || "",
         };
       }
     }),

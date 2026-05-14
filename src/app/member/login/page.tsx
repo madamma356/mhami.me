@@ -24,10 +24,8 @@ function LoginContent() {
       
       {/* Header / Nav */}
       <header style={{ padding: '2rem 5%', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 10 }}>
-        <Link href="/" style={{ textDecoration: 'none' }}>
-          <h1 style={{ fontFamily: '"Playfair Display", "Noto Serif Thai", serif', color: 'var(--primary)', fontSize: '1.8rem', letterSpacing: '2px', margin: 0, textShadow: '0 0 10px rgba(214,180,124,0.3)' }}>
-            Mhami
-          </h1>
+        <Link href="/" style={{ textDecoration: 'none', display: 'block' }}>
+          <img src="/images/logo.png" alt="Mhami Logo" style={{ height: '50px', objectFit: 'contain' }} />
         </Link>
       </header>
 
