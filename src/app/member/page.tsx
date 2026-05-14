@@ -14,11 +14,13 @@ export default function MemberDashboard() {
   // Mock User State
   const [user, setUser] = useState({
     name: 'กำลังโหลด...',
-    dob: '-',
-    birthTime: '-',
+    nickname: '-',
+    dob: '',
+    birthTime: '',
     province: '-',
     phone: '-',
-    lineId: '-'
+    ascendant: '',
+    isRegistered: true
   });
 
   const [isEditing, setIsEditing] = useState(false);
@@ -39,6 +41,15 @@ export default function MemberDashboard() {
   // Mock Data
   const [activeOrders, setActiveOrders] = useState<any[]>([]);
   const [pastReadings, setPastReadings] = useState<any[]>([]);
+
+  const getAscendantStyle = (asc: string) => {
+    if (!asc) return { color: 'var(--text-muted)', bg: 'rgba(255,255,255,0.05)', icon: 'fas fa-hourglass-half' };
+    if (asc.includes('เมษ') || asc.includes('สิงห์') || asc.includes('ธนู')) return { color: '#ff7675', bg: 'rgba(255, 118, 117, 0.1)', icon: 'fas fa-fire' };
+    if (asc.includes('พฤษภ') || asc.includes('กันย์') || asc.includes('มังกร')) return { color: '#e1b12c', bg: 'rgba(225, 177, 44, 0.1)', icon: 'fas fa-leaf' };
+    if (asc.includes('เมถุน') || asc.includes('ตุลย์') || asc.includes('กุมภ์')) return { color: '#74b9ff', bg: 'rgba(116, 185, 255, 0.1)', icon: 'fas fa-wind' };
+    if (asc.includes('กรกฎ') || asc.includes('พิจิก') || asc.includes('มีน')) return { color: '#0984e3', bg: 'rgba(9, 132, 227, 0.1)', icon: 'fas fa-water' };
+    return { color: 'var(--primary)', bg: 'rgba(214, 180, 124, 0.1)', icon: 'fas fa-star' };
+  };
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -154,15 +165,43 @@ export default function MemberDashboard() {
         </div>
 
         {/* Right Column (Profile) */}
-        <div className="healing-card" style={{ padding: '2rem', position: 'sticky', top: '2rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-            <h3 style={{ color: 'var(--primary)', margin: 0, fontSize: '1.3rem' }}>ข้อมูลชะตาของคุณ</h3>
-            {!isEditing && (
-              <button onClick={() => setIsEditing(true)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.9rem' }}>
-                <i className="fas fa-edit" style={{ marginRight: '0.3rem' }}></i> แก้ไข
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', position: 'sticky', top: '2rem' }}>
+          
+          {/* Registration Invitation Banner */}
+          {!user.isRegistered && !isLoading && !isEditing && (
+            <div 
+              onClick={() => setIsEditing(true)}
+              className="healing-card fade-in" 
+              style={{ 
+                padding: '1.5rem', 
+                background: 'linear-gradient(135deg, rgba(214, 180, 124, 0.15) 0%, rgba(26, 24, 22, 0.8) 100%)',
+                border: '1px solid var(--primary)',
+                cursor: 'pointer',
+                textAlign: 'center'
+              }}
+            >
+              <h4 style={{ color: 'var(--primary)', margin: '0 0 0.5rem 0', fontSize: '1.1rem' }}>
+                <i className="fas fa-sparkles" style={{ marginRight: '0.5rem' }}></i> 
+                คำนวณลัคนาราศีฟรี!
+              </h4>
+              <p style={{ color: 'var(--text-main)', fontSize: '0.9rem', lineHeight: '1.5', margin: '0 0 1rem 0' }}>
+                กรอกข้อมูลวันเกิดให้ครบ เพื่อให้หม่ามี๊คำนวณลัคนาราศีให้ฟรี! นำไปใช้ดูดวงใน Channel ได้แม่นยำยิ่งขึ้น ✨
+              </p>
+              <button className="cozy-button filled" style={{ padding: '0.5rem 1.5rem', fontSize: '0.9rem' }}>
+                คลิกเพื่อกรอกข้อมูล
               </button>
-            )}
-          </div>
+            </div>
+          )}
+
+          <div className="healing-card" style={{ padding: '2rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+              <h3 style={{ color: 'var(--primary)', margin: 0, fontSize: '1.3rem' }}>ข้อมูลชะตาของคุณ</h3>
+              {!isEditing && (
+                <button onClick={() => setIsEditing(true)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.9rem' }}>
+                  <i className="fas fa-edit" style={{ marginRight: '0.3rem' }}></i> แก้ไข
+                </button>
+              )}
+            </div>
 
           {isEditing ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -173,13 +212,25 @@ export default function MemberDashboard() {
                   value={editForm.name} 
                   onChange={(e) => setEditForm({...editForm, name: e.target.value})}
                   className="cozy-input"
+                  placeholder="ชื่อ-นามสกุลจริง"
                   style={{ width: '100%' }}
                 />
               </div>
               <div>
-                <label style={{ color: 'var(--text-muted)', fontSize: '0.85rem', display: 'block', marginBottom: '0.3rem' }}>วัน/เดือน/ปีเกิด (พ.ศ.)</label>
+                <label style={{ color: 'var(--text-muted)', fontSize: '0.85rem', display: 'block', marginBottom: '0.3rem' }}>ชื่อเล่น</label>
                 <input 
                   type="text" 
+                  value={editForm.nickname} 
+                  onChange={(e) => setEditForm({...editForm, nickname: e.target.value})}
+                  className="cozy-input"
+                  placeholder="ชื่อเล่น"
+                  style={{ width: '100%' }}
+                />
+              </div>
+              <div>
+                <label style={{ color: 'var(--text-muted)', fontSize: '0.85rem', display: 'block', marginBottom: '0.3rem' }}>วัน/เดือน/ปีเกิด</label>
+                <input 
+                  type="date" 
                   value={editForm.dob} 
                   onChange={(e) => setEditForm({...editForm, dob: e.target.value})}
                   className="cozy-input"
@@ -189,7 +240,7 @@ export default function MemberDashboard() {
               <div>
                 <label style={{ color: 'var(--text-muted)', fontSize: '0.85rem', display: 'block', marginBottom: '0.3rem' }}>เวลาเกิด</label>
                 <input 
-                  type="text" 
+                  type="time" 
                   value={editForm.birthTime} 
                   onChange={(e) => setEditForm({...editForm, birthTime: e.target.value})}
                   className="cozy-input"
@@ -229,33 +280,51 @@ export default function MemberDashboard() {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               <div>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '0 0 0.3rem 0' }}>ชื่อ-นามสกุล</p>
-                <p style={{ color: 'var(--text-main)', margin: 0, fontSize: '1rem' }}>{user.name}</p>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '0 0 0.3rem 0' }}>ลัคนาราศี (คำนวณจากเวลาเกิด)</p>
+                {user.ascendant ? (
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: getAscendantStyle(user.ascendant).bg, padding: '0.5rem 1rem', borderRadius: '0.5rem', border: `1px solid ${getAscendantStyle(user.ascendant).color}40` }}>
+                    <i className={getAscendantStyle(user.ascendant).icon} style={{ color: getAscendantStyle(user.ascendant).color }}></i>
+                    <span style={{ color: getAscendantStyle(user.ascendant).color, fontWeight: 'bold' }}>{user.ascendant}</span>
+                  </div>
+                ) : (
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(255,255,255,0.05)', padding: '0.5rem 1rem', borderRadius: '0.5rem', border: '1px solid rgba(255,255,255,0.1)' }}>
+                    <i className="fas fa-hourglass-half" style={{ color: 'var(--text-muted)' }}></i>
+                    <span style={{ color: 'var(--text-muted)' }}>รอหม่ามี๊คำนวณชะตา...</span>
+                  </div>
+                )}
               </div>
-              <div>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '0 0 0.3rem 0' }}>วัน/เดือน/ปีเกิด (พ.ศ.)</p>
-                <p style={{ color: 'var(--text-main)', margin: 0, fontSize: '1rem' }}>{user.dob}</p>
-              </div>
+              
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                 <div>
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '0 0 0.3rem 0' }}>เวลาเกิด</p>
-                  <p style={{ color: 'var(--text-main)', margin: 0, fontSize: '1rem' }}>{user.birthTime}</p>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '0 0 0.3rem 0' }}>ชื่อ-นามสกุล</p>
+                  <p style={{ color: 'var(--text-main)', margin: 0, fontSize: '1rem' }}>{user.name || '-'}</p>
                 </div>
                 <div>
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '0 0 0.3rem 0' }}>จังหวัดที่เกิด</p>
-                  <p style={{ color: 'var(--text-main)', margin: 0, fontSize: '1rem' }}>{user.province}</p>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '0 0 0.3rem 0' }}>ชื่อเล่น</p>
+                  <p style={{ color: 'var(--text-main)', margin: 0, fontSize: '1rem' }}>{user.nickname || '-'}</p>
                 </div>
               </div>
-              <div>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '0 0 0.3rem 0' }}>เบอร์โทรศัพท์</p>
-                <p style={{ color: 'var(--text-main)', margin: 0, fontSize: '1rem' }}>{user.phone}</p>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '0 0 0.3rem 0' }}>วัน/เดือน/ปีเกิด</p>
+                  <p style={{ color: 'var(--text-main)', margin: 0, fontSize: '1rem' }}>{user.dob ? new Date(user.dob).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' }) : '-'}</p>
+                </div>
+                <div>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '0 0 0.3rem 0' }}>เวลาเกิด</p>
+                  <p style={{ color: 'var(--text-main)', margin: 0, fontSize: '1rem' }}>{user.birthTime || '-'}</p>
+                </div>
               </div>
-              <div>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '0 0 0.3rem 0' }}>LINE ID</p>
-                <p style={{ color: 'var(--text-main)', margin: 0, fontSize: '1rem' }}>
-                  <i className="fab fa-line" style={{ color: '#00B900', marginRight: '0.5rem' }}></i> 
-                  {user.lineId}
-                </p>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '0 0 0.3rem 0' }}>จังหวัดที่เกิด</p>
+                  <p style={{ color: 'var(--text-main)', margin: 0, fontSize: '1rem' }}>{user.province || '-'}</p>
+                </div>
+                <div>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '0 0 0.3rem 0' }}>เบอร์โทรศัพท์</p>
+                  <p style={{ color: 'var(--text-main)', margin: 0, fontSize: '1rem' }}>{user.phone || '-'}</p>
+                </div>
               </div>
               
               <div style={{ marginTop: '1rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(214, 180, 124, 0.1)' }}>

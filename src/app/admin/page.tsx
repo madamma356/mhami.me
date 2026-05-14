@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
-import { getAdminOrders, updateAdminPrediction, updateOrderStatus, uploadAdminPdf } from '@/app/actions/admin';
+import { getAdminOrders, updateAdminPrediction, updateOrderStatus, uploadAdminPdf, getAllCustomers, updateCustomerAscendant } from '@/app/actions/admin';
 
 const mockOrders = [
     { 
@@ -29,6 +29,7 @@ export default function AdminDashboard() {
   const [predictionData, setPredictionData] = useState<any>({});
   
   const [ordersList, setOrdersList] = useState<any[]>([]);
+  const [customersList, setCustomersList] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const { data: session, status } = useSession();
@@ -49,6 +50,14 @@ export default function AdminDashboard() {
       }
     };
     fetchOrders();
+
+    const fetchCustomers = async () => {
+      const dbCustomers = await getAllCustomers();
+      if (dbCustomers && dbCustomers.length > 0) {
+        setCustomersList(dbCustomers);
+      }
+    };
+    fetchCustomers();
   }, []);
 
   const handleOpenWorkspace = (order: any) => {
@@ -98,6 +107,11 @@ export default function AdminDashboard() {
     if (order && order.dbId) {
       await updateOrderStatus(order.dbId, order.slipStatus, stage);
     }
+  };
+
+  const handleUpdateAscendant = async (userId: string, ascendant: string) => {
+    setCustomersList(prev => prev.map(c => c.id === userId ? { ...c, ascendant } : c));
+    await updateCustomerAscendant(userId, ascendant);
   };
 
   useEffect(() => {
@@ -401,30 +415,75 @@ export default function AdminDashboard() {
                   <thead>
                     <tr style={{ borderBottom: '1px solid rgba(214, 180, 124, 0.2)', background: 'rgba(0,0,0,0.2)' }}>
                       <th style={{ padding: '1.5rem', color: 'var(--primary)', fontWeight: 400 }}>รหัสลูกค้า</th>
-                      <th style={{ padding: '1.5rem', color: 'var(--primary)', fontWeight: 400 }}>ชื่อ-นามสกุล</th>
+                      <th style={{ padding: '1.5rem', color: 'var(--primary)', fontWeight: 400 }}>ชื่อ-นามสกุล / ชื่อเล่น</th>
                       <th style={{ padding: '1.5rem', color: 'var(--primary)', fontWeight: 400 }}>ช่องทางติดต่อ</th>
-                      <th style={{ padding: '1.5rem', color: 'var(--primary)', fontWeight: 400 }}>วันที่สมัคร</th>
-                      <th style={{ padding: '1.5rem', color: 'var(--primary)', fontWeight: 400, textAlign: 'center' }}>จำนวนออเดอร์</th>
+                      <th style={{ padding: '1.5rem', color: 'var(--primary)', fontWeight: 400 }}>วันเกิด / เวลาเกิด</th>
+                      <th style={{ padding: '1.5rem', color: 'var(--primary)', fontWeight: 400 }}>จังหวัด</th>
                       <th style={{ padding: '1.5rem', color: 'var(--primary)', fontWeight: 400 }}>สถานะ</th>
+                      <th style={{ padding: '1.5rem', color: 'var(--primary)', fontWeight: 400 }}>ลัคนาราศี</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {[
-                      { id: 'CUS-001', name: 'คุณพลอยดาว ใจดี', contact: '081-xxx-xxxx / Line: ploy_genz', date: '01 พ.ค. 2026', orders: 3, status: 'Active', statusColor: '#33d9b2' },
-                      { id: 'CUS-002', name: 'คุณต้น สู้ชีวิต', contact: '089-xxx-xxxx / Line: ton_1990', date: '15 เม.ย. 2026', orders: 1, status: 'Active', statusColor: '#33d9b2' },
-                      { id: 'CUS-003', name: 'คุณเมย์ เมษา', contact: '082-xxx-xxxx / Line: maymay', date: '10 มี.ค. 2026', orders: 5, status: 'VIP', statusColor: 'var(--primary)' },
-                    ].map((c, i) => (
+                    {customersList.map((c, i) => (
                       <tr key={i} style={{ borderBottom: '1px solid rgba(214, 180, 124, 0.1)' }}>
-                        <td style={{ padding: '1.5rem' }}>{c.id}</td>
-                        <td style={{ padding: '1.5rem' }}>{c.name}</td>
-                        <td style={{ padding: '1.5rem', color: 'var(--text-muted)' }}>{c.contact}</td>
-                        <td style={{ padding: '1.5rem', color: 'var(--text-muted)' }}>{c.date}</td>
-                        <td style={{ padding: '1.5rem', textAlign: 'center' }}>{c.orders}</td>
+                        <td style={{ padding: '1.5rem', fontSize: '0.9rem', color: 'var(--text-muted)' }}>{c.id.substring(0, 8)}...</td>
                         <td style={{ padding: '1.5rem' }}>
-                          <span style={{ padding: '0.4rem 1rem', borderRadius: '2rem', fontSize: '0.8rem', backgroundColor: `${c.statusColor}20`, color: c.statusColor, border: `1px solid ${c.statusColor}40` }}>{c.status}</span>
+                          <span style={{ color: 'var(--text-main)', display: 'block' }}>{c.name}</span>
+                          {c.nickname && <span style={{ color: 'var(--primary)', fontSize: '0.85rem' }}>({c.nickname})</span>}
+                        </td>
+                        <td style={{ padding: '1.5rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                          <div style={{ marginBottom: '0.2rem' }}><i className="fas fa-phone" style={{ width: '20px' }}></i> {c.contact}</div>
+                          <div><i className="fab fa-line" style={{ color: '#00B900', width: '20px' }}></i> {c.lineId}</div>
+                        </td>
+                        <td style={{ padding: '1.5rem', color: 'var(--text-main)' }}>
+                          <div style={{ marginBottom: '0.2rem' }}>{c.dob}</div>
+                          <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}><i className="far fa-clock"></i> {c.birthTime} น.</div>
+                        </td>
+                        <td style={{ padding: '1.5rem', color: 'var(--text-main)' }}>{c.province}</td>
+                        <td style={{ padding: '1.5rem' }}>
+                          <span style={{ padding: '0.4rem 1rem', borderRadius: '2rem', fontSize: '0.8rem', backgroundColor: `${c.statusColor}20`, color: c.statusColor, border: `1px solid ${c.statusColor}40` }}>{c.status} ({c.orders} ออเดอร์)</span>
+                        </td>
+                        <td style={{ padding: '1.5rem' }}>
+                          <select 
+                            value={c.ascendant || ''}
+                            onChange={(e) => handleUpdateAscendant(c.id, e.target.value)}
+                            style={{ 
+                              backgroundColor: 'rgba(0,0,0,0.4)', color: 'var(--text-main)', 
+                              border: '1px solid rgba(214, 180, 124, 0.3)', padding: '0.5rem', 
+                              borderRadius: '0.5rem', outline: 'none', cursor: 'pointer',
+                              fontFamily: 'inherit', fontSize: '0.9rem', width: '150px'
+                            }}
+                          >
+                            <option value="">-- ยังไม่คำนวณ --</option>
+                            <optgroup label="🔥 ธาตุไฟ">
+                              <option value="เมษ ♈">เมษ ♈</option>
+                              <option value="สิงห์ ♌">สิงห์ ♌</option>
+                              <option value="ธนู ♐">ธนู ♐</option>
+                            </optgroup>
+                            <optgroup label="🌍 ธาตุดิน">
+                              <option value="พฤษภ ♉">พฤษภ ♉</option>
+                              <option value="กันย์ ♍">กันย์ ♍</option>
+                              <option value="มังกร ♑">มังกร ♑</option>
+                            </optgroup>
+                            <optgroup label="💨 ธาตุลม">
+                              <option value="เมถุน ♊">เมถุน ♊</option>
+                              <option value="ตุลย์ ♎">ตุลย์ ♎</option>
+                              <option value="กุมภ์ ♒">กุมภ์ ♒</option>
+                            </optgroup>
+                            <optgroup label="💧 ธาตุน้ำ">
+                              <option value="กรกฎ ♋">กรกฎ ♋</option>
+                              <option value="พิจิก ♏">พิจิก ♏</option>
+                              <option value="มีน ♓">มีน ♓</option>
+                            </optgroup>
+                          </select>
                         </td>
                       </tr>
                     ))}
+                    {customersList.length === 0 && (
+                      <tr>
+                        <td colSpan={7} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>ยังไม่มีข้อมูลลูกค้าในระบบ หรือกำลังโหลดข้อมูล...</td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>

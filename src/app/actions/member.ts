@@ -73,12 +73,13 @@ export async function getMemberData() {
 
     // Parse profile data
     let profileData = {
-      name: dbUser.name || 'คุณลูกค้า',
+      name: dbUser.name || '',
+      nickname: '',
       dob: '',
       birthTime: '',
       province: '',
       phone: '',
-      lineId: ''
+      ascendant: ''
     };
 
     if (dbUser.profileData) {
@@ -112,8 +113,16 @@ export async function getMemberData() {
     const activeOrders = formattedOrders.filter(o => o.status !== 'พร้อมส่งมอบความสบายใจ');
     const pastReadings = formattedOrders.filter(o => o.status === 'พร้อมส่งมอบความสบายใจ');
 
+    // Check if the user has completed their registration
+    const isRegistered = !!(
+      profileData.name &&
+      profileData.dob &&
+      profileData.birthTime &&
+      profileData.province
+    );
+
     return {
-      user: profileData,
+      user: { ...profileData, isRegistered },
       activeOrders,
       pastReadings
     };
@@ -155,7 +164,14 @@ export async function updateMemberProfile(data: any) {
       where: { id: userIdToUpdate },
       data: {
         name: data.name,
-        profileData: JSON.stringify(data)
+        profileData: JSON.stringify({
+          nickname: data.nickname || '',
+          dob: data.dob || '',
+          birthTime: data.birthTime || '',
+          province: data.province || '',
+          phone: data.phone || '',
+          ascendant: data.ascendant || '' // Ensure we preserve ascendant
+        })
       }
     });
 

@@ -163,3 +163,79 @@ export async function uploadAdminPdf(dbId: string, pdfBase64: string) {
     return { success: false, error };
   }
 }
+
+export async function getAllCustomers() {
+  try {
+    const users = await prisma.user.findMany({
+      include: {
+        orders: true
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    return users.map(user => {
+      let profileData: any = {};
+      try {
+        if (user.profileData) {
+          profileData = JSON.parse(user.profileData);
+        }
+      } catch (e) {}
+
+      // Identify VIP based on orders count
+      const ordersCount = user.orders.length;
+      const status = ordersCount > 3 ? 'VIP' : 'Active';
+      const statusColor = ordersCount > 3 ? 'var(--primary)' : '#33d9b2';
+
+      return {
+        id: user.id,
+        name: user.name || 'คุณลูกค้า',
+        nickname: profileData.nickname || '',
+        contact: profileData.phone || user.email,
+        lineId: profileData.lineId || '-',
+        date: user.createdAt.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' }),
+        orders: ordersCount,
+        status: status,
+        statusColor: statusColor,
+        dob: profileData.dob || '-',
+        birthTime: profileData.birthTime || '-',
+        province: profileData.province || '-',
+        ascendant: profileData.ascendant || ''
+      };
+    });
+  } catch (error) {
+    console.error("Error fetching all customers:", error);
+    return [];
+  }
+}
+
+export async function updateCustomerAscendant(userId: string, ascendant: string) {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId }
+    });
+
+    if (!user) return { success: false, error: 'User not found' };
+
+    let profileData: any = {};
+    try {
+      if (user.profileData) {
+        profileData = JSON.parse(user.profileData);
+      }
+    } catch (e) {}
+
+    profileData.ascendant = ascendant;
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        profileData: JSON.stringify(profileData)
+      }
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating customer ascendant:", error);
+    return { success: false, error };
+  }
+}
+

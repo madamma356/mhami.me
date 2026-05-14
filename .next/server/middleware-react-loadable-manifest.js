@@ -1,1 +1,1 @@
-self.__REACT_LOADABLE_MANIFEST="{}"
+self.__REACT_LOADABLE_MANIFEST="{\"app/reading/[id]/page.tsx -> @/components/PDFReader\":{\"id\":\"app/reading/[id]/page.tsx -> @/components/PDFReader\",\"files\":[\"static/chunks/_app-pages-browser_src_components_PDFReader_tsx.js\"]}}"

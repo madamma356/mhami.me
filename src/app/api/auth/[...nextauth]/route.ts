@@ -36,13 +36,12 @@ export const authOptions: NextAuthOptions = {
           await prisma.user.upsert({
             where: { email: `${lineId}@line.dummy` },
             create: {
-              name: user.name || "คุณลูกค้า",
+              name: "", // Force user to fill it in
               email: `${lineId}@line.dummy`,
               image: user.image || "",
             },
             update: {
-              name: user.name || "คุณลูกค้า",
-              image: user.image || "",
+              image: user.image || "", // Don't overwrite the manually typed name
             }
           });
         }
@@ -56,7 +55,34 @@ export const authOptions: NextAuthOptions = {
         const lineId = profile?.sub || user.id;
         token.id = lineId;
         token.email = `${lineId}@line.dummy`;
-        token.role = "USER";
+        
+        // Fetch true role from database to ensure Admins get their crown
+        try {
+          let dbRole = "USER";
+          const dbUser = await prisma.user.findFirst({
+            where: {
+              OR: [
+                { id: lineId },
+                { email: `${lineId}@line.dummy` }
+              ]
+            }
+          });
+          
+          if (dbUser) {
+            dbRole = dbUser.role;
+          } else {
+            // Check old PrismaAdapter linked accounts
+            const account = await prisma.account.findFirst({
+              where: { provider: 'line', providerAccountId: lineId },
+              include: { user: true }
+            });
+            if (account) dbRole = account.user.role;
+          }
+          token.role = dbRole;
+        } catch (error) {
+          console.error("Error fetching user role:", error);
+          token.role = "USER";
+        }
       }
       return token;
     },
@@ -64,6 +90,7 @@ export const authOptions: NextAuthOptions = {
       if (session.user && token) {
         (session.user as any).id = token.id;
         session.user.email = token.email as string;
+        (session.user as any).role = token.role;
       }
       return session;
     }

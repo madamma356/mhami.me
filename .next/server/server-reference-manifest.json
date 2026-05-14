@@ -1,5 +1,46 @@
 {
-  "node": {},
+  "node": {
+    "68768c7087e0d06b01480bef7d6e50abcb07fcea": {
+      "workers": {
+        "app/reading/[id]/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2FUsers%2Fma%2FMhami%E0%B9%81%E0%B8%9A%E0%B8%9A%E0%B8%AA%E0%B8%B1%E0%B8%9A%2Fmystic_matriarch%2Fsrc%2Fapp%2Factions%2Freading.ts%22%2C%5B%22getReadingById%22%5D%5D%5D&encryptionKey=iPk1nU2edUG9VrWhYxCh2S3WdcpWTzEK9%2BJHiCwMyrY%3D&__client_imported__=true!"
+      },
+      "layer": {
+        "app/reading/[id]/page": "action-browser"
+      }
+    },
+    "09e9e7b27ffbbda40107e0f28e2d244387aca871": {
+      "workers": {
+        "app/admin/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2FUsers%2Fma%2FMhami%E0%B9%81%E0%B8%9A%E0%B8%9A%E0%B8%AA%E0%B8%B1%E0%B8%9A%2Fmystic_matriarch%2Fsrc%2Fapp%2Factions%2Fadmin.ts%22%2C%5B%22updateAdminPrediction%22%2C%22updateOrderStatus%22%2C%22uploadAdminPdf%22%2C%22getAdminOrders%22%5D%5D%5D&encryptionKey=iPk1nU2edUG9VrWhYxCh2S3WdcpWTzEK9%2BJHiCwMyrY%3D&__client_imported__=true!"
+      },
+      "layer": {
+        "app/admin/page": "action-browser"
+      }
+    },
+    "40f820cf7aa97a4b057e25eef718f26395de9802": {
+      "workers": {
+        "app/admin/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2FUsers%2Fma%2FMhami%E0%B9%81%E0%B8%9A%E0%B8%9A%E0%B8%AA%E0%B8%B1%E0%B8%9A%2Fmystic_matriarch%2Fsrc%2Fapp%2Factions%2Fadmin.ts%22%2C%5B%22updateAdminPrediction%22%2C%22updateOrderStatus%22%2C%22uploadAdminPdf%22%2C%22getAdminOrders%22%5D%5D%5D&encryptionKey=iPk1nU2edUG9VrWhYxCh2S3WdcpWTzEK9%2BJHiCwMyrY%3D&__client_imported__=true!"
+      },
+      "layer": {
+        "app/admin/page": "action-browser"
+      }
+    },
+    "bb122241719f89a260c604a839d884a52b70435d": {
+      "workers": {
+        "app/admin/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2FUsers%2Fma%2FMhami%E0%B9%81%E0%B8%9A%E0%B8%9A%E0%B8%AA%E0%B8%B1%E0%B8%9A%2Fmystic_matriarch%2Fsrc%2Fapp%2Factions%2Fadmin.ts%22%2C%5B%22updateAdminPrediction%22%2C%22updateOrderStatus%22%2C%22uploadAdminPdf%22%2C%22getAdminOrders%22%5D%5D%5D&encryptionKey=iPk1nU2edUG9VrWhYxCh2S3WdcpWTzEK9%2BJHiCwMyrY%3D&__client_imported__=true!"
+      },
+      "layer": {
+        "app/admin/page": "action-browser"
+      }
+    },
+    "c580a5a5016f6bb6407c39d929c3c7e9ab6bd8b4": {
+      "workers": {
+        "app/admin/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2FUsers%2Fma%2FMhami%E0%B9%81%E0%B8%9A%E0%B8%9A%E0%B8%AA%E0%B8%B1%E0%B8%9A%2Fmystic_matriarch%2Fsrc%2Fapp%2Factions%2Fadmin.ts%22%2C%5B%22updateAdminPrediction%22%2C%22updateOrderStatus%22%2C%22uploadAdminPdf%22%2C%22getAdminOrders%22%5D%5D%5D&encryptionKey=iPk1nU2edUG9VrWhYxCh2S3WdcpWTzEK9%2BJHiCwMyrY%3D&__client_imported__=true!"
+      },
+      "layer": {
+        "app/admin/page": "action-browser"
+      }
+    }
+  },
   "edge": {},
   "encryptionKey": "iPk1nU2edUG9VrWhYxCh2S3WdcpWTzEK9+JHiCwMyrY="
 }
