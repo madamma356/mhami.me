@@ -31,6 +31,15 @@ export default function AdminDashboard() {
   
   const [ordersList, setOrdersList] = useState<any[]>([]);
   const [customersList, setCustomersList] = useState<any[]>([]);
+  const [servicesList, setServicesList] = useState<any[]>([]);
+  const [reviewsList, setReviewsList] = useState<any[]>([]);
+  const [blogsList, setBlogsList] = useState<any[]>([]);
+  
+  const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [isBlogModalOpen, setIsBlogModalOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<any>(null);
+
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const { data: session, status } = useSession();
@@ -59,6 +68,22 @@ export default function AdminDashboard() {
       }
     };
     fetchCustomers();
+
+    const fetchCMSData = async () => {
+      try {
+        const [servicesRes, reviewsRes, blogsRes] = await Promise.all([
+          fetch('/api/admin/services'),
+          fetch('/api/admin/reviews'),
+          fetch('/api/admin/blogs')
+        ]);
+        if (servicesRes.ok) setServicesList(await servicesRes.json());
+        if (reviewsRes.ok) setReviewsList(await reviewsRes.json());
+        if (blogsRes.ok) setBlogsList(await blogsRes.json());
+      } catch (e) {
+        console.error("Failed to fetch CMS data", e);
+      }
+    };
+    fetchCMSData();
   }, []);
 
   const handleOpenWorkspace = (order: any) => {
@@ -109,6 +134,74 @@ export default function AdminDashboard() {
       await updateOrderStatus(order.dbId, order.slipStatus, stage);
     }
   };
+
+  // CMS Functions
+  const handleSaveService = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const method = editingItem?.id ? 'PUT' : 'POST';
+    const res = await fetch('/api/admin/services', {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(editingItem)
+    });
+    if (res.ok) {
+      const saved = await res.json();
+      setServicesList(prev => method === 'POST' ? [saved, ...prev] : prev.map(s => s.id === saved.id ? saved : s));
+      setIsServiceModalOpen(false);
+      setEditingItem(null);
+    }
+  };
+
+  const handleDeleteService = async (id: string) => {
+    if (!confirm('ยืนยันการลบบริการนี้?')) return;
+    const res = await fetch(`/api/admin/services?id=${id}`, { method: 'DELETE' });
+    if (res.ok) setServicesList(prev => prev.filter(s => s.id !== id));
+  };
+
+  const handleSaveReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const method = editingItem?.id ? 'PUT' : 'POST';
+    const res = await fetch('/api/admin/reviews', {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(editingItem)
+    });
+    if (res.ok) {
+      const saved = await res.json();
+      setReviewsList(prev => method === 'POST' ? [saved, ...prev] : prev.map(r => r.id === saved.id ? saved : r));
+      setIsReviewModalOpen(false);
+      setEditingItem(null);
+    }
+  };
+
+  const handleDeleteReview = async (id: string) => {
+    if (!confirm('ยืนยันการลบรีวิวนี้?')) return;
+    const res = await fetch(`/api/admin/reviews?id=${id}`, { method: 'DELETE' });
+    if (res.ok) setReviewsList(prev => prev.filter(r => r.id !== id));
+  };
+
+  const handleSaveBlog = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const method = editingItem?.id ? 'PUT' : 'POST';
+    const res = await fetch('/api/admin/blogs', {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(editingItem)
+    });
+    if (res.ok) {
+      const saved = await res.json();
+      setBlogsList(prev => method === 'POST' ? [saved, ...prev] : prev.map(b => b.id === saved.id ? saved : b));
+      setIsBlogModalOpen(false);
+      setEditingItem(null);
+    }
+  };
+
+  const handleDeleteBlog = async (id: string) => {
+    if (!confirm('ยืนยันการลบบทความนี้?')) return;
+    const res = await fetch(`/api/admin/blogs?id=${id}`, { method: 'DELETE' });
+    if (res.ok) setBlogsList(prev => prev.filter(b => b.id !== id));
+  };
+
 
   const handleUpdateAscendant = async (userId: string, ascendant: string) => {
     setCustomersList(prev => prev.map(c => c.id === userId ? { ...c, ascendant } : c));
@@ -476,33 +569,37 @@ export default function AdminDashboard() {
             <div className="fade-in">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                 <h3 style={{ color: 'var(--primary)', fontSize: '1.2rem' }}>จัดการบริการพยากรณ์</h3>
-                <button className="cozy-button filled"><i className="fas fa-plus"></i> เพิ่มบริการใหม่</button>
+                <button 
+                  className="cozy-button filled" 
+                  onClick={() => { setEditingItem({ isActive: true }); setIsServiceModalOpen(true); }}
+                >
+                  <i className="fas fa-plus"></i> เพิ่มบริการใหม่
+                </button>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
-                {[
-                  { title: 'Mini Empower (3 คำถาม)', price: '195.-', active: true, image: '/images/service-1-new.png' },
-                  { title: 'ไขความลับชีวิต (Life Unveiled)', price: '695.-', active: true, image: '/images/service-2-phromyan.png' },
-                  { title: 'พลิกชะตาฟ้าลิขิต (Destiny Rewrite)', price: '8,995.-', active: true, image: '/images/service-3-new.png' },
-                ].map((s, i) => (
-                  <div key={i} style={{ backgroundColor: 'rgba(26, 24, 22, 0.6)', border: `1px solid ${s.active ? 'rgba(214, 180, 124, 0.4)' : 'rgba(255,255,255,0.1)'}`, borderRadius: '1rem', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-                    <div style={{ height: '150px', backgroundImage: `url(${s.image})`, backgroundSize: 'cover', backgroundPosition: 'center', opacity: s.active ? 1 : 0.4 }}></div>
+                {servicesList.map((s, i) => (
+                  <div key={i} style={{ backgroundColor: 'rgba(26, 24, 22, 0.6)', border: `1px solid ${s.isActive ? 'rgba(214, 180, 124, 0.4)' : 'rgba(255,255,255,0.1)'}`, borderRadius: '1rem', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                    <div style={{ height: '150px', backgroundImage: `url(${s.imageUrl || '/images/logo.png'})`, backgroundSize: 'cover', backgroundPosition: 'center', opacity: s.isActive ? 1 : 0.4 }}></div>
                     <div style={{ padding: '1.5rem' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
                         <h4 style={{ color: 'var(--text-main)', fontSize: '1.1rem', margin: 0 }}>{s.title}</h4>
-                        <button style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}><i className="fas fa-edit"></i></button>
+                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                          <button onClick={() => { setEditingItem(s); setIsServiceModalOpen(true); }} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}><i className="fas fa-edit"></i></button>
+                          <button onClick={() => handleDeleteService(s.id)} style={{ background: 'none', border: 'none', color: '#ff6b6b', cursor: 'pointer' }}><i className="fas fa-trash"></i></button>
+                        </div>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <p style={{ color: 'var(--primary)', fontSize: '1.2rem', margin: 0 }}>{s.price}</p>
+                        <p style={{ color: 'var(--primary)', fontSize: '1.2rem', margin: 0 }}>{s.price}.-</p>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                          <span style={{ color: s.active ? '#33d9b2' : 'var(--text-muted)', fontSize: '0.8rem' }}>{s.active ? 'เปิดรับคิว' : 'ปิดชั่วคราว'}</span>
-                          <div style={{ width: '40px', height: '20px', backgroundColor: s.active ? '#33d9b2' : 'rgba(255,255,255,0.1)', borderRadius: '10px', position: 'relative', cursor: 'pointer', transition: 'all 0.3s' }}>
-                            <div style={{ width: '16px', height: '16px', backgroundColor: '#fff', borderRadius: '50%', position: 'absolute', top: '2px', left: s.active ? '22px' : '2px', transition: 'all 0.3s' }}></div>
-                          </div>
+                          <span style={{ color: s.isActive ? '#33d9b2' : 'var(--text-muted)', fontSize: '0.8rem' }}>{s.isActive ? 'เปิดรับคิว' : 'ปิดชั่วคราว'}</span>
                         </div>
                       </div>
                     </div>
                   </div>
                 ))}
+                {servicesList.length === 0 && (
+                  <p style={{ color: 'var(--text-muted)' }}>ยังไม่มีข้อมูลบริการ</p>
+                )}
               </div>
             </div>
           )}
@@ -512,7 +609,12 @@ export default function AdminDashboard() {
             <div className="fade-in">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                 <h3 style={{ color: 'var(--primary)', fontSize: '1.2rem' }}>ระบบจัดการรีวิวลูกค้า</h3>
-                <button className="cozy-button filled"><i className="fas fa-plus"></i> เพิ่มรีวิวใหม่</button>
+                <button 
+                  className="cozy-button filled" 
+                  onClick={() => { setEditingItem({ isVisible: true }); setIsReviewModalOpen(true); }}
+                >
+                  <i className="fas fa-plus"></i> เพิ่มรีวิวใหม่
+                </button>
               </div>
               <div style={{ backgroundColor: 'rgba(26, 24, 22, 0.6)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '1rem', overflow: 'hidden' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', color: 'var(--text-main)', textAlign: 'left' }}>
@@ -526,28 +628,29 @@ export default function AdminDashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {[
-                      { id: 'rev-001', author: "น้องพลอยดาว", text: "หม่ามี๊คือพื้นที่ปลอดภัยจริงๆ ค่ะ การเปิดไพ่ 3 คำถามทำให้เราได้คำตอบที่ชัดเจนและตรงประเด็น โดยไม่รู้สึกว่าโดนตัดสินเลย แนะนำมากๆ สำหรับคนที่กำลังสับสน", date: '01 พ.ค. 2026', visible: true },
-                      { id: 'rev-002', author: "คุณมัดหมี่", text: "ดีไซน์ห้องฮีลใจสวยและสงบมากๆ ค่ะ เข้ามาแล้วรู้สึกเหมือนได้รับการสวมกอดที่อบอุ่นและทำให้ใจเย็นลงได้จริงๆ", date: '03 พ.ค. 2026', visible: true },
-                      { id: 'rev-003', author: "ผู้ไม่ประสงค์ออกนาม", text: "แค่ได้พิมพ์ระบายความกังวลในพื้นที่ฮีลใจและมองดูมันลอยหายไป ก็รู้สึกโล่งใจขึ้นมาก ฟังดูเหมือนง่ายแต่มันช่วยเยียวยาได้จริงๆ ค่ะ", date: '05 พ.ค. 2026', visible: false }
-                    ].map((r, i) => (
+                    {reviewsList.map((r, i) => (
                       <tr key={i} style={{ borderBottom: '1px solid rgba(214, 180, 124, 0.1)' }}>
                         <td style={{ padding: '1.5rem', whiteSpace: 'nowrap' }}>{r.author}</td>
                         <td style={{ padding: '1.5rem', color: 'var(--text-muted)', maxWidth: '400px' }}>
                           <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>"{r.text}"</div>
                         </td>
-                        <td style={{ padding: '1.5rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{r.date}</td>
+                        <td style={{ padding: '1.5rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{new Date(r.createdAt).toLocaleDateString('th-TH')}</td>
                         <td style={{ padding: '1.5rem' }}>
-                          <span style={{ padding: '0.4rem 1rem', borderRadius: '2rem', fontSize: '0.8rem', backgroundColor: r.visible ? '#33d9b220' : 'rgba(255,255,255,0.05)', color: r.visible ? '#33d9b2' : 'var(--text-muted)', border: `1px solid ${r.visible ? '#33d9b240' : 'transparent'}` }}>{r.visible ? 'แสดงอยู่' : 'ซ่อน'}</span>
+                          <span style={{ padding: '0.4rem 1rem', borderRadius: '2rem', fontSize: '0.8rem', backgroundColor: r.isVisible ? '#33d9b220' : 'rgba(255,255,255,0.05)', color: r.isVisible ? '#33d9b2' : 'var(--text-muted)', border: `1px solid ${r.isVisible ? '#33d9b240' : 'transparent'}` }}>{r.isVisible ? 'แสดงอยู่' : 'ซ่อน'}</span>
                         </td>
                         <td style={{ padding: '1.5rem' }}>
                           <div style={{ display: 'flex', gap: '0.5rem' }}>
-                            <button className="cozy-button" style={{ padding: '0.4rem', fontSize: '0.9rem' }}><i className="fas fa-edit"></i></button>
-                            <button className="cozy-button" style={{ padding: '0.4rem', fontSize: '0.9rem', color: '#ff6b6b', borderColor: '#ff6b6b20' }}><i className="fas fa-trash"></i></button>
+                            <button onClick={() => { setEditingItem(r); setIsReviewModalOpen(true); }} className="cozy-button" style={{ padding: '0.4rem', fontSize: '0.9rem' }}><i className="fas fa-edit"></i></button>
+                            <button onClick={() => handleDeleteReview(r.id)} className="cozy-button" style={{ padding: '0.4rem', fontSize: '0.9rem', color: '#ff6b6b', borderColor: '#ff6b6b20' }}><i className="fas fa-trash"></i></button>
                           </div>
                         </td>
                       </tr>
                     ))}
+                    {reviewsList.length === 0 && (
+                      <tr>
+                        <td colSpan={5} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>ยังไม่มีข้อมูลรีวิว</td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -559,28 +662,32 @@ export default function AdminDashboard() {
             <div className="fade-in">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                 <h3 style={{ color: 'var(--primary)', fontSize: '1.2rem' }}>ระบบจัดการบทความ (Blog CMS)</h3>
-                <button className="cozy-button filled"><i className="fas fa-pen-nib"></i> สร้างบทความใหม่</button>
+                <button 
+                  className="cozy-button filled" 
+                  onClick={() => { setEditingItem({ status: 'published' }); setIsBlogModalOpen(true); }}
+                >
+                  <i className="fas fa-pen-nib"></i> สร้างบทความใหม่
+                </button>
               </div>
               
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '2rem' }}>
-                {[
-                  { title: 'Self-Love: พลังแห่งการโอบกอดตัวเอง', excerpt: 'การรักตัวเองไม่ใช่ความเห็นแก่ตัว แต่คือจุดเริ่มต้นของการดึงดูดพลังงานดีๆ เข้ามาในชีวิต...', date: '10 พ.ค. 2026', status: 'Published' },
-                  { title: 'Manifestation: เสกสิ่งที่คิดให้เป็นความจริง', excerpt: 'คุณรู้หรือไม่ว่าจิตใต้สำนึกของเรามีพลังมหาศาลในการดึงดูดสิ่งต่างๆ กฎแห่งแรงดึงดูดจะทำงาน...', date: '08 พ.ค. 2026', status: 'Published' },
-                  { title: 'วิธีจัดการความเครียดในวันแย่ๆ', excerpt: 'บางวันเราอาจจะรู้สึกแย่จนไม่อยากทำอะไรเลย ลองวิธีฮีลใจง่ายๆ เหล่านี้...', date: 'Draft', status: 'Draft' }
-                ].map((b, i) => (
+                {blogsList.map((b, i) => (
                   <div key={i} style={{ backgroundColor: 'rgba(26, 24, 22, 0.6)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '1rem', padding: '2rem', display: 'flex', flexDirection: 'column' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                      <span style={{ padding: '0.3rem 0.8rem', borderRadius: '2rem', fontSize: '0.75rem', backgroundColor: b.status === 'Published' ? '#33d9b220' : 'rgba(255,255,255,0.05)', color: b.status === 'Published' ? '#33d9b2' : 'var(--text-muted)' }}>{b.status}</span>
-                      <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>{b.date}</span>
+                      <span style={{ padding: '0.3rem 0.8rem', borderRadius: '2rem', fontSize: '0.75rem', backgroundColor: b.status === 'published' ? '#33d9b220' : 'rgba(255,255,255,0.05)', color: b.status === 'published' ? '#33d9b2' : 'var(--text-muted)' }}>{b.status}</span>
+                      <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>{new Date(b.createdAt).toLocaleDateString('th-TH')}</span>
                     </div>
                     <h4 style={{ color: 'var(--text-main)', fontSize: '1.2rem', marginBottom: '1rem', lineHeight: '1.4' }}>{b.title}</h4>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: '1.6', marginBottom: '2rem', flex: 1 }}>{b.excerpt}</p>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: '1.6', marginBottom: '2rem', flex: 1 }}>{b.content.substring(0, 100)}...</p>
                     <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', borderTop: '1px solid rgba(214, 180, 124, 0.1)', paddingTop: '1.5rem' }}>
-                      <button className="cozy-button" style={{ padding: '0.5rem 1rem', fontSize: '0.8rem' }}><i className="fas fa-edit" style={{ marginRight: '0.5rem' }}></i> แก้ไข</button>
-                      <button className="cozy-button" style={{ padding: '0.5rem 1rem', fontSize: '0.8rem', color: '#ff6b6b', borderColor: '#ff6b6b20' }}><i className="fas fa-trash"></i></button>
+                      <button onClick={() => { setEditingItem(b); setIsBlogModalOpen(true); }} className="cozy-button" style={{ padding: '0.5rem 1rem', fontSize: '0.8rem' }}><i className="fas fa-edit" style={{ marginRight: '0.5rem' }}></i> แก้ไข</button>
+                      <button onClick={() => handleDeleteBlog(b.id)} className="cozy-button" style={{ padding: '0.5rem 1rem', fontSize: '0.8rem', color: '#ff6b6b', borderColor: '#ff6b6b20' }}><i className="fas fa-trash"></i></button>
                     </div>
                   </div>
                 ))}
+                {blogsList.length === 0 && (
+                  <p style={{ color: 'var(--text-muted)' }}>ยังไม่มีบทความ</p>
+                )}
               </div>
             </div>
           )}
@@ -897,6 +1004,114 @@ export default function AdminDashboard() {
               </div>
             </div>
 
+          </div>
+        </div>
+      )}
+
+      {/* CMS Modals */}
+      {isServiceModalOpen && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.8)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
+          <div className="fade-in" style={{ backgroundColor: 'var(--bg-main)', width: '100%', maxWidth: '600px', borderRadius: '1rem', border: '1px solid rgba(214, 180, 124, 0.2)', display: 'flex', flexDirection: 'column', maxHeight: '90vh' }}>
+            <div style={{ padding: '2rem', borderBottom: '1px solid rgba(214, 180, 124, 0.1)' }}>
+              <h3 style={{ color: 'var(--primary)', margin: 0 }}>{editingItem?.id ? 'แก้ไขบริการ' : 'เพิ่มบริการใหม่'}</h3>
+            </div>
+            <form onSubmit={handleSaveService} style={{ padding: '2rem', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <div>
+                <label style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '0.5rem', display: 'block' }}>ชื่อบริการ (Title)</label>
+                <input type="text" value={editingItem?.title || ''} onChange={e => setEditingItem({ ...editingItem, title: e.target.value })} style={{ width: '100%', padding: '1rem', backgroundColor: 'rgba(0,0,0,0.3)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '0.5rem', color: 'var(--text-main)' }} required />
+              </div>
+              <div>
+                <label style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '0.5rem', display: 'block' }}>ประเภท/รหัสบริการ (เช่น PHROM_YAN)</label>
+                <input type="text" value={editingItem?.typeKey || ''} onChange={e => setEditingItem({ ...editingItem, typeKey: e.target.value })} style={{ width: '100%', padding: '1rem', backgroundColor: 'rgba(0,0,0,0.3)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '0.5rem', color: 'var(--text-main)' }} required />
+              </div>
+              <div>
+                <label style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '0.5rem', display: 'block' }}>ราคา (บาท)</label>
+                <input type="number" value={editingItem?.price || 0} onChange={e => setEditingItem({ ...editingItem, price: e.target.value })} style={{ width: '100%', padding: '1rem', backgroundColor: 'rgba(0,0,0,0.3)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '0.5rem', color: 'var(--text-main)' }} required />
+              </div>
+              <div>
+                <label style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '0.5rem', display: 'block' }}>ลิงก์รูปภาพประกอบ (Image URL)</label>
+                <input type="text" value={editingItem?.imageUrl || ''} onChange={e => setEditingItem({ ...editingItem, imageUrl: e.target.value })} style={{ width: '100%', padding: '1rem', backgroundColor: 'rgba(0,0,0,0.3)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '0.5rem', color: 'var(--text-main)' }} />
+              </div>
+              <div>
+                <label style={{ color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '1rem', cursor: 'pointer' }}>
+                  <input type="checkbox" checked={editingItem?.isActive || false} onChange={e => setEditingItem({ ...editingItem, isActive: e.target.checked })} style={{ width: '20px', height: '20px' }} />
+                  เปิดรับคิว (Active)
+                </label>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1rem' }}>
+                <button type="button" onClick={() => setIsServiceModalOpen(false)} className="cozy-button">ยกเลิก</button>
+                <button type="submit" className="cozy-button filled">บันทึก</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {isReviewModalOpen && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.8)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
+          <div className="fade-in" style={{ backgroundColor: 'var(--bg-main)', width: '100%', maxWidth: '600px', borderRadius: '1rem', border: '1px solid rgba(214, 180, 124, 0.2)', display: 'flex', flexDirection: 'column', maxHeight: '90vh' }}>
+            <div style={{ padding: '2rem', borderBottom: '1px solid rgba(214, 180, 124, 0.1)' }}>
+              <h3 style={{ color: 'var(--primary)', margin: 0 }}>{editingItem?.id ? 'แก้ไขรีวิว' : 'เพิ่มรีวิวใหม่'}</h3>
+            </div>
+            <form onSubmit={handleSaveReview} style={{ padding: '2rem', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <div>
+                <label style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '0.5rem', display: 'block' }}>ชื่อลูกค้า</label>
+                <input type="text" value={editingItem?.author || ''} onChange={e => setEditingItem({ ...editingItem, author: e.target.value })} style={{ width: '100%', padding: '1rem', backgroundColor: 'rgba(0,0,0,0.3)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '0.5rem', color: 'var(--text-main)' }} required />
+              </div>
+              <div>
+                <label style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '0.5rem', display: 'block' }}>ข้อความรีวิว</label>
+                <textarea rows={5} value={editingItem?.text || ''} onChange={e => setEditingItem({ ...editingItem, text: e.target.value })} style={{ width: '100%', padding: '1rem', backgroundColor: 'rgba(0,0,0,0.3)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '0.5rem', color: 'var(--text-main)', resize: 'none' }} required></textarea>
+              </div>
+              <div>
+                <label style={{ color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '1rem', cursor: 'pointer' }}>
+                  <input type="checkbox" checked={editingItem?.isVisible || false} onChange={e => setEditingItem({ ...editingItem, isVisible: e.target.checked })} style={{ width: '20px', height: '20px' }} />
+                  โชว์ที่หน้าหลัก (Visible)
+                </label>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1rem' }}>
+                <button type="button" onClick={() => setIsReviewModalOpen(false)} className="cozy-button">ยกเลิก</button>
+                <button type="submit" className="cozy-button filled">บันทึก</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {isBlogModalOpen && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.8)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
+          <div className="fade-in" style={{ backgroundColor: 'var(--bg-main)', width: '100%', maxWidth: '800px', borderRadius: '1rem', border: '1px solid rgba(214, 180, 124, 0.2)', display: 'flex', flexDirection: 'column', maxHeight: '90vh' }}>
+            <div style={{ padding: '2rem', borderBottom: '1px solid rgba(214, 180, 124, 0.1)' }}>
+              <h3 style={{ color: 'var(--primary)', margin: 0 }}>{editingItem?.id ? 'แก้ไขบทความ' : 'สร้างบทความใหม่'}</h3>
+            </div>
+            <form onSubmit={handleSaveBlog} style={{ padding: '2rem', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <div>
+                <label style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '0.5rem', display: 'block' }}>หัวข้อบทความ (Title)</label>
+                <input type="text" value={editingItem?.title || ''} onChange={e => setEditingItem({ ...editingItem, title: e.target.value })} style={{ width: '100%', padding: '1rem', backgroundColor: 'rgba(0,0,0,0.3)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '0.5rem', color: 'var(--text-main)' }} required />
+              </div>
+              <div>
+                <label style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '0.5rem', display: 'block' }}>URL Slug (เช่น how-to-love-yourself)</label>
+                <input type="text" value={editingItem?.slug || ''} onChange={e => setEditingItem({ ...editingItem, slug: e.target.value })} style={{ width: '100%', padding: '1rem', backgroundColor: 'rgba(0,0,0,0.3)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '0.5rem', color: 'var(--text-main)' }} required />
+              </div>
+              <div>
+                <label style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '0.5rem', display: 'block' }}>เนื้อหาบทความ (รองรับ HTML)</label>
+                <textarea rows={10} value={editingItem?.content || ''} onChange={e => setEditingItem({ ...editingItem, content: e.target.value })} style={{ width: '100%', padding: '1rem', backgroundColor: 'rgba(0,0,0,0.3)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '0.5rem', color: 'var(--text-main)', resize: 'vertical' }} required></textarea>
+              </div>
+              <div>
+                <label style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '0.5rem', display: 'block' }}>ลิงก์รูปภาพหน้าปก (Cover Image URL)</label>
+                <input type="text" value={editingItem?.imageUrl || ''} onChange={e => setEditingItem({ ...editingItem, imageUrl: e.target.value })} style={{ width: '100%', padding: '1rem', backgroundColor: 'rgba(0,0,0,0.3)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '0.5rem', color: 'var(--text-main)' }} />
+              </div>
+              <div>
+                <label style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '0.5rem', display: 'block' }}>สถานะ (Status)</label>
+                <select value={editingItem?.status || 'published'} onChange={e => setEditingItem({ ...editingItem, status: e.target.value })} style={{ width: '100%', padding: '1rem', backgroundColor: 'rgba(0,0,0,0.3)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '0.5rem', color: 'var(--text-main)' }}>
+                  <option value="published">เผยแพร่ (Published)</option>
+                  <option value="draft">ร่าง (Draft)</option>
+                </select>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1rem' }}>
+                <button type="button" onClick={() => setIsBlogModalOpen(false)} className="cozy-button">ยกเลิก</button>
+                <button type="submit" className="cozy-button filled">บันทึก</button>
+              </div>
+            </form>
           </div>
         </div>
       )}
