@@ -54,8 +54,6 @@ export default function MemberDashboard() {
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/member/login');
-    } else if (session?.user && (session.user as any).role === 'ADMIN') {
-      router.push('/admin');
     }
   }, [status, session, router]);
 

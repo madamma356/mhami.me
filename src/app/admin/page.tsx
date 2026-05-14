@@ -151,14 +151,14 @@ export default function AdminDashboard() {
   ];
 
   if (!isAuthorized) {
-    return <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg-dark)' }}></div>;
+    return <div style={{ minHeight: '100vh', backgroundColor: 'var(--background)' }}></div>;
   }
 
   return (
     <div style={{
       position: 'fixed',
       top: 0, left: 0, right: 0, bottom: 0,
-      backgroundColor: 'var(--bg-dark)',
+      backgroundColor: 'var(--background)',
       zIndex: 9999,
       display: 'flex',
       overflow: 'hidden'
@@ -228,7 +228,7 @@ export default function AdminDashboard() {
       </aside>
 
       {/* Main Content Area */}
-      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-dark)' }}>
+      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: 'var(--background)' }}>
         {/* Header */}
         <header style={{ 
           height: '80px', 

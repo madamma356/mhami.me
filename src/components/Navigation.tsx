@@ -9,7 +9,7 @@ export default function Navigation() {
   const pathname = usePathname();
   const { data: session, status } = useSession();
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const isAdminUser = session?.user && (session.user as any).role === 'ADMIN';
 
   // Handle scroll effect
   useEffect(() => {
@@ -18,16 +18,6 @@ export default function Navigation() {
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Check Admin status
-  useEffect(() => {
-    const checkAdmin = () => {
-      setIsAdmin(localStorage.getItem('mhami_is_admin') === 'true');
-    };
-    checkAdmin();
-    window.addEventListener('auth-change', checkAdmin);
-    return () => window.removeEventListener('auth-change', checkAdmin);
   }, []);
 
   const navLinks = [
@@ -83,7 +73,7 @@ export default function Navigation() {
             );
           })}
           
-          {isAdmin && (
+          {isAdminUser && (
             <Link 
               href="/admin" 
               style={{ 
@@ -93,7 +83,11 @@ export default function Navigation() {
                 fontWeight: 500,
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.5rem'
+                gap: '0.5rem',
+                backgroundColor: 'rgba(214, 180, 124, 0.1)',
+                padding: '0.4rem 1rem',
+                borderRadius: '2rem',
+                border: '1px solid rgba(214, 180, 124, 0.3)'
               }}
               className="nav-link"
             >
