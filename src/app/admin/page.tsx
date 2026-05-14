@@ -158,9 +158,9 @@ export default function AdminDashboard() {
   return (
     <div style={{
       position: 'fixed',
-      top: 0, left: 0, right: 0, bottom: 0,
+      top: '90px', left: 0, right: 0, bottom: 0,
       backgroundColor: 'transparent',
-      zIndex: 9999,
+      zIndex: 10,
       display: 'flex',
       overflow: 'hidden'
     }}>
