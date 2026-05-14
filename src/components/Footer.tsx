@@ -2,8 +2,14 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export default function Footer() {
+  const pathname = usePathname();
+  
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
   return (
     <footer style={{ backgroundColor: 'rgba(26, 24, 22, 0.6)', padding: '3rem 1.5rem', textAlign: 'center', borderTop: '1px solid rgba(214, 180, 124, 0.1)', marginTop: 'auto', backdropFilter: 'blur(10px)' }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>

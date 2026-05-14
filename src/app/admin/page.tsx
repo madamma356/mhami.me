@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import { getAdminOrders, updateAdminPrediction, updateOrderStatus, uploadAdminPdf, getAllCustomers, updateCustomerAscendant } from '@/app/actions/admin';
+import Footer from '@/components/Footer';
 
 const mockOrders = [
     { 
@@ -158,7 +159,7 @@ export default function AdminDashboard() {
     <div style={{
       position: 'fixed',
       top: 0, left: 0, right: 0, bottom: 0,
-      backgroundColor: 'var(--background)',
+      backgroundColor: 'transparent',
       zIndex: 9999,
       display: 'flex',
       overflow: 'hidden'
@@ -228,7 +229,7 @@ export default function AdminDashboard() {
       </aside>
 
       {/* Main Content Area */}
-      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: 'var(--background)' }}>
+      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: 'transparent' }}>
         {/* Header */}
         <header style={{ 
           height: '80px', 
@@ -916,6 +917,12 @@ export default function AdminDashboard() {
           </div>
         </div>
       )}
+
+      <div style={{ margin: 'auto -3rem -3rem -3rem', marginTop: '3rem' }}>
+        <Footer />
+      </div>
+    </div>
+    </main>
 
       <style dangerouslySetInnerHTML={{__html: `
         .fade-in {
