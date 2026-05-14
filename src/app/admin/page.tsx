@@ -616,6 +616,9 @@ export default function AdminDashboard() {
              </div>
           )}
 
+          <div style={{ margin: 'auto -3rem -3rem -3rem', marginTop: '3rem' }}>
+            <Footer />
+          </div>
         </div>
       </main>
 
@@ -917,12 +920,6 @@ export default function AdminDashboard() {
           </div>
         </div>
       )}
-
-      <div style={{ margin: 'auto -3rem -3rem -3rem', marginTop: '3rem' }}>
-        <Footer />
-      </div>
-    </div>
-    </main>
 
       <style dangerouslySetInnerHTML={{__html: `
         .fade-in {
