@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "prisma db push --accept-data-loss && next start",
+    "start": "npx prisma db push --accept-data-loss && next start",
     "lint": "next lint",
     "postinstall": "prisma generate"
   },
@@ -17,7 +17,8 @@
     "next-auth": "^4.24.10",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-pdf": "^10.4.1"
+    "react-pdf": "^10.4.1",
+    "prisma": "^5.21.1"
   },
   "devDependencies": {
     "@types/node": "^20",
@@ -25,7 +26,6 @@
     "@types/react-dom": "^19",
     "eslint": "^8",
     "eslint-config-next": "^15.0.7",
-    "prisma": "^5.21.1",
     "typescript": "^5"
   }
 }
