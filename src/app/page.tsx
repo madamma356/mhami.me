@@ -2,8 +2,23 @@ import React from 'react';
 import Link from 'next/link';
 import HealingRoomInput from '@/components/HealingRoomInput';
 import { mockReviews, mockVentingMessages, mockArticles } from '@/lib/mockDb';
+import { prisma } from '@/lib/prisma';
 
-export default function Home() {
+export default async function Home() {
+  const dbBlogs = await prisma.blog.findMany({
+    where: { status: 'published' },
+    orderBy: { createdAt: 'desc' },
+    take: 3
+  });
+  
+  // Use DB blogs if available, otherwise fallback to mock articles
+  const displayBlogs = dbBlogs.length > 0 ? dbBlogs.map(b => ({
+    id: b.id,
+    title: b.title,
+    slug: b.slug,
+    excerpt: b.content.substring(0, 150) + '...',
+    imageUrl: b.imageUrl || '/images/logo.png'
+  })) : mockArticles;
   return (
     <div style={{ minHeight: '100vh', paddingBottom: '5rem' }}>
       
@@ -162,16 +177,18 @@ export default function Home() {
           <p style={{ fontSize: '1.1rem', color: 'var(--text-muted)', marginBottom: '4rem' }}>บทความฮีลใจ</p>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', width: '100%' }}>
-            {mockArticles.map(article => (
-              <div key={article.id} className="healing-card mockup-card" style={{ padding: '0', overflow: 'hidden' }}>
+            {displayBlogs.map(article => (
+              <div key={article.id} className="healing-card mockup-card" style={{ padding: '0', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                 <div style={{ width: '100%', height: '180px', backgroundColor: 'rgba(0,0,0,0.5)', overflow: 'hidden' }}>
                   <img src={article.imageUrl} alt={article.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
-                <div style={{ padding: '1.5rem' }}>
+                <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
                 <h3 style={{ color: 'var(--primary)', marginBottom: '1rem', fontSize: '1.25rem' }}>{article.title}</h3>
-                <p style={{ color: 'var(--text-muted)', fontWeight: 300 }}>{article.excerpt}</p>
+                <p style={{ color: 'var(--text-muted)', fontWeight: 300, flexGrow: 1 }}>{article.excerpt}</p>
                 <div style={{ marginTop: '1.5rem', textAlign: 'right' }}>
-                  <button className="cozy-button" style={{ padding: '0.3rem 1rem', fontSize: '0.75rem', borderRadius: '1rem' }}>อ่านต่อ</button>
+                  <Link href={`/blog/${article.slug}`}>
+                    <button className="cozy-button" style={{ padding: '0.3rem 1rem', fontSize: '0.75rem', borderRadius: '1rem', cursor: 'pointer' }}>อ่านต่อ</button>
+                  </Link>
                 </div>
                 </div>
               </div>
