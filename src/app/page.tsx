@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import HealingRoomInput from '@/components/HealingRoomInput';
-import { mockReviews, mockVentingMessages, mockArticles } from '@/lib/mockDb';
+import { mockReviews, mockArticles } from '@/lib/mockDb';
 import { prisma } from '@/lib/prisma';
 
 export default async function Home() {
@@ -159,7 +159,7 @@ export default async function Home() {
           <p style={{ fontSize: '1.1rem', color: 'var(--text-muted)', marginBottom: '4rem', zIndex: 1 }}>ระบาย. ปลดปล่อย. สูดลมหายใจ.</p>
 
           <div style={{ zIndex: 1, width: '100%' }}>
-            <HealingRoomInput initialMessages={mockVentingMessages} />
+            <HealingRoomInput />
           </div>
           
         </section>

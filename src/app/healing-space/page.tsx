@@ -2,7 +2,6 @@
 
 import React from 'react';
 import HealingRoomInput from '@/components/HealingRoomInput';
-import { mockVentingMessages } from '@/lib/mockDb';
 
 export default function HealingSpacePage() {
   return (
@@ -25,7 +24,7 @@ export default function HealingSpacePage() {
           <p style={{ fontSize: '1.3rem', color: 'var(--text-main)', marginBottom: '4rem', zIndex: 1, fontWeight: 300, letterSpacing: '2px', opacity: 0.9 }}>ระบาย. ปลดปล่อย. สูดลมหายใจ.</p>
 
           <div style={{ zIndex: 1, width: '100%' }}>
-            <HealingRoomInput initialMessages={mockVentingMessages} />
+            <HealingRoomInput />
           </div>
           
         </section>

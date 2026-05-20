@@ -2,31 +2,56 @@
 
 import React, { useState, useEffect } from 'react';
 
-export default function HealingRoomInput({ initialMessages }: { initialMessages: { id: string, content: string, isUser?: boolean }[] }) {
+export default function HealingRoomInput({ initialMessages = [] }: { initialMessages?: { id: string, content: string, isUser?: boolean }[] }) {
   const [text, setText] = useState('');
-  const [messages, setMessages] = useState(initialMessages);
+  const [messages, setMessages] = useState<{ id: string, content: string, isUser?: boolean }[]>(initialMessages);
   const [animating, setAnimating] = useState(false);
   const [isClient, setIsClient] = useState(false);
 
+  const fetchMessages = async () => {
+    try {
+      const res = await fetch('/api/venting');
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.length > 0) {
+          setMessages(data);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch venting messages', error);
+    }
+  };
+
   useEffect(() => {
     setIsClient(true);
+    fetchMessages();
+    const interval = setInterval(fetchMessages, 30000); // Poll every 30 seconds
+    return () => clearInterval(interval);
   }, []);
 
-  const handleRelease = () => {
+  const handleRelease = async () => {
     if (!text.trim()) return;
     
     setAnimating(true);
     
-    setTimeout(() => {
-      const newMessage = {
-        id: Date.now().toString(),
-        content: text,
-        isUser: true
-      };
-      setMessages(prev => [newMessage, ...prev]);
-      setText('');
+    try {
+      const res = await fetch('/api/venting', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: text })
+      });
+      
+      if (res.ok) {
+        const newMessage = await res.json();
+        // Optimistically add to UI, mark as user message so it glows more
+        setMessages(prev => [{ ...newMessage, isUser: true }, ...prev]);
+        setText('');
+      }
+    } catch (error) {
+      console.error('Failed to post venting message', error);
+    } finally {
       setAnimating(false);
-    }, 1500);
+    }
   };
 
   return (
