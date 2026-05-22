@@ -277,7 +277,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div style={{
+    <div className="flex-col-mobile" style={{
       position: 'fixed',
       top: '90px', left: 0, right: 0, bottom: 0,
       backgroundColor: 'transparent',
@@ -286,7 +286,7 @@ export default function AdminDashboard() {
       overflow: 'hidden'
     }}>
       {/* Sidebar */}
-      <aside style={{
+      <aside className="w-full-mobile h-auto-mobile border-none-mobile" style={{
         width: '280px',
         backgroundColor: 'rgba(26, 24, 22, 0.95)',
         borderRight: '1px solid rgba(214, 180, 124, 0.1)',
@@ -352,7 +352,7 @@ export default function AdminDashboard() {
       {/* Main Content Area */}
       <main style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: 'transparent' }}>
         {/* Admin Header removed to prevent duplication with Main Navigation */}        {/* Scrollable Content */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '3rem' }}>
+        <div className="padding-mobile-sm" style={{ flex: 1, overflowY: 'auto', padding: '3rem' }}>
           
           {/* TAB: DASHBOARD */}
           {activeTab === 'dashboard' && (
@@ -380,7 +380,7 @@ export default function AdminDashboard() {
 
               {/* Recent Orders Table */}
               <h3 style={{ color: 'var(--primary)', marginBottom: '1.5rem', fontSize: '1.2rem' }}>คำสั่งซื้อล่าสุด (รอตรวจสลิป)</h3>
-              <div style={{ backgroundColor: 'rgba(26, 24, 22, 0.6)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '1rem', overflow: 'hidden' }}>
+              <div style={{ backgroundColor: 'rgba(26, 24, 22, 0.6)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '1rem', overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', color: 'var(--text-main)', textAlign: 'left' }}>
                   <thead>
                     <tr style={{ borderBottom: '1px solid rgba(214, 180, 124, 0.2)', background: 'rgba(0,0,0,0.2)' }}>
@@ -440,7 +440,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              <div style={{ backgroundColor: 'rgba(26, 24, 22, 0.6)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '1rem', overflow: 'hidden' }}>
+              <div style={{ backgroundColor: 'rgba(26, 24, 22, 0.6)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '1rem', overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', color: 'var(--text-main)', textAlign: 'left' }}>
                   <thead>
                     <tr style={{ borderBottom: '1px solid rgba(214, 180, 124, 0.2)', background: 'rgba(0,0,0,0.2)' }}>
@@ -514,7 +514,7 @@ export default function AdminDashboard() {
                   <button className="cozy-button"><i className="fas fa-search"></i></button>
                 </div>
               </div>
-              <div style={{ backgroundColor: 'rgba(26, 24, 22, 0.6)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '1rem', overflow: 'hidden' }}>
+              <div style={{ backgroundColor: 'rgba(26, 24, 22, 0.6)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '1rem', overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', color: 'var(--text-main)', textAlign: 'left' }}>
                   <thead>
                     <tr style={{ borderBottom: '1px solid rgba(214, 180, 124, 0.2)', background: 'rgba(0,0,0,0.2)' }}>
@@ -646,7 +646,7 @@ export default function AdminDashboard() {
                   <i className="fas fa-plus"></i> เพิ่มรีวิวใหม่
                 </button>
               </div>
-              <div style={{ backgroundColor: 'rgba(26, 24, 22, 0.6)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '1rem', overflow: 'hidden' }}>
+              <div style={{ backgroundColor: 'rgba(26, 24, 22, 0.6)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '1rem', overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', color: 'var(--text-main)', textAlign: 'left' }}>
                   <thead>
                     <tr style={{ borderBottom: '1px solid rgba(214, 180, 124, 0.2)', background: 'rgba(0,0,0,0.2)' }}>
@@ -735,7 +735,7 @@ export default function AdminDashboard() {
                 </button>
               </div>
               
-              <div style={{ backgroundColor: 'rgba(26, 24, 22, 0.6)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '1rem', overflow: 'hidden' }}>
+              <div style={{ backgroundColor: 'rgba(26, 24, 22, 0.6)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '1rem', overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', color: 'var(--text-main)', textAlign: 'left' }}>
                   <thead>
                     <tr style={{ borderBottom: '1px solid rgba(214, 180, 124, 0.2)', background: 'rgba(0,0,0,0.2)' }}>

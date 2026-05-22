@@ -11,6 +11,8 @@ export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const isAdminUser = session?.user && (session.user as any).role === 'ADMIN';
 
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   // Handle scroll effect
   useEffect(() => {
     const handleScroll = () => {
@@ -45,12 +47,22 @@ export default function Navigation() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 2rem', maxWidth: '1400px', margin: '0 auto', width: '100%' }}>
         
         {/* Logo */}
-        <Link href="/" style={{ textDecoration: 'none' }}>
+        <Link href="/" style={{ textDecoration: 'none' }} onClick={() => setIsMobileMenuOpen(false)}>
           <img src="/images/logo.png" alt="Mhami Logo" style={{ height: isScrolled ? '35px' : '40px', objectFit: 'contain', transition: 'height 0.3s' }} />
         </Link>
+
+        {/* Mobile Hamburger Button */}
+        <div className="hidden-desktop block" style={{ zIndex: 60 }}>
+          <button 
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            style={{ background: 'none', border: 'none', color: 'var(--primary)', fontSize: '1.5rem', cursor: 'pointer' }}
+          >
+            <i className={`fas ${isMobileMenuOpen ? 'fa-times' : 'fa-bars'}`}></i>
+          </button>
+        </div>
         
-        {/* Navigation Links */}
-        <div style={{ display: 'flex', gap: '2rem', alignItems: 'center', fontSize: '0.95rem', color: 'var(--text-main)', fontWeight: 300 }}>
+        {/* Navigation Links - Desktop */}
+        <div className="hidden-mobile" style={{ display: 'flex', gap: '2rem', alignItems: 'center', fontSize: '0.95rem', color: 'var(--text-main)', fontWeight: 300 }}>
           {navLinks.map((link) => {
             const isActive = pathname === link.path || (link.path !== '/' && pathname.startsWith(link.path));
             return (
@@ -119,13 +131,107 @@ export default function Navigation() {
                 style={{ textDecoration: 'none', padding: '0.5rem 1.2rem', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem', backgroundColor: '#00B900', color: '#fff', border: 'none' }}
               >
                 <i className="fab fa-line" style={{ fontSize: '1.2rem' }}></i>
-                เข้าสู่ระบบ / สมาชิก
+                เข้าสู่ระบบ
               </Link>
             )}
           </div>
         </div>
 
       </div>
+
+      {/* Mobile Navigation Drawer */}
+      {isMobileMenuOpen && (
+        <div style={{
+          position: 'absolute',
+          top: '100%',
+          left: 0,
+          right: 0,
+          backgroundColor: 'rgba(17, 10, 7, 0.98)',
+          backdropFilter: 'blur(20px)',
+          borderBottom: '1px solid rgba(214, 180, 124, 0.2)',
+          padding: '2rem',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '1.5rem',
+          boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+          zIndex: 40
+        }} className="hidden-desktop flex-col-mobile">
+          {/* User Profile for Mobile */}
+          <div style={{ paddingBottom: '1.5rem', borderBottom: '1px solid rgba(214, 180, 124, 0.1)', display: 'flex', justifyContent: 'center' }}>
+            {status === 'loading' ? (
+              <div style={{ color: 'var(--text-muted)' }}>...</div>
+            ) : session ? (
+              <Link 
+                href="/member"
+                onClick={() => setIsMobileMenuOpen(false)}
+                style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.8rem', cursor: 'pointer', padding: '0.5rem 1.2rem', borderRadius: '2rem', backgroundColor: 'rgba(214, 180, 124, 0.1)', border: '1px solid rgba(214, 180, 124, 0.3)' }}
+              >
+                <img 
+                  src={session.user?.image || "/images/logo.png"} 
+                  alt="Profile" 
+                  style={{ width: '35px', height: '35px', borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--primary)' }} 
+                  onError={(e) => { e.currentTarget.src = '/images/logo.png' }}
+                />
+                <span style={{ color: 'var(--primary)', fontSize: '1rem' }}>{session.user?.name || "คุณลูกค้า"}</span>
+              </Link>
+            ) : (
+              <Link 
+                href="/member/login"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="cozy-button" 
+                style={{ textDecoration: 'none', padding: '0.8rem 1.5rem', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', backgroundColor: '#00B900', color: '#fff', border: 'none', width: '100%', justifyContent: 'center' }}
+              >
+                <i className="fab fa-line" style={{ fontSize: '1.2rem' }}></i>
+                เข้าสู่ระบบด้วย LINE
+              </Link>
+            )}
+          </div>
+
+          {navLinks.map((link) => {
+            const isActive = pathname === link.path || (link.path !== '/' && pathname.startsWith(link.path));
+            return (
+              <Link 
+                key={link.name} 
+                href={link.path} 
+                onClick={() => setIsMobileMenuOpen(false)}
+                style={{ 
+                  textDecoration: 'none', 
+                  color: isActive ? 'var(--primary)' : 'var(--text-main)',
+                  transition: 'color 0.3s',
+                  fontSize: '1.1rem',
+                  textAlign: 'center',
+                  fontWeight: isActive ? 500 : 300
+                }}
+              >
+                {link.name}
+              </Link>
+            );
+          })}
+          
+          {isAdminUser && (
+            <Link 
+              href="/admin" 
+              onClick={() => setIsMobileMenuOpen(false)}
+              style={{ 
+                textDecoration: 'none', 
+                color: 'var(--primary)',
+                fontWeight: 500,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem',
+                backgroundColor: 'rgba(214, 180, 124, 0.1)',
+                padding: '0.8rem 1rem',
+                borderRadius: '0.5rem',
+                border: '1px solid rgba(214, 180, 124, 0.3)',
+                marginTop: '0.5rem'
+              }}
+            >
+              <i className="fas fa-crown"></i> จัดการระบบแอดมิน
+            </Link>
+          )}
+        </div>
+      )}
     </nav>
   );
 }

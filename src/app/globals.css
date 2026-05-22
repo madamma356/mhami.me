@@ -129,3 +129,51 @@ a {
   background-color: var(--primary-glow);
   box-shadow: 0 0 25px rgba(244, 212, 153, 0.5);
 }
+
+/* Responsive Utilities */
+.hidden-desktop {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .hidden-mobile {
+    display: none !important;
+  }
+  .hidden-desktop {
+    display: flex !important;
+  }
+  .hidden-desktop.block {
+    display: block !important;
+  }
+  
+  /* Typography adjustments for mobile */
+  html {
+    font-size: 14px;
+  }
+  
+  /* Helper classes for mobile flex layouts */
+  .flex-col-mobile {
+    flex-direction: column !important;
+  }
+  
+  .text-center-mobile {
+    text-align: center !important;
+  }
+  
+  .w-full-mobile {
+    width: 100% !important;
+  }
+  
+  .h-auto-mobile {
+    height: auto !important;
+  }
+
+  .border-none-mobile {
+    border: none !important;
+  }
+  
+  .padding-mobile-sm {
+    padding: 1rem !important;
+  }
+}
+

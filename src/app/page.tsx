@@ -34,7 +34,7 @@ export default async function Home() {
       
 
 
-      <main style={{ padding: '2rem 4rem', maxWidth: '1400px', margin: '0 auto' }}>
+      <main className="padding-mobile-sm" style={{ padding: '2rem 4rem', maxWidth: '1400px', margin: '0 auto' }}>
         
         {/* HERO */}
         <section style={{ minHeight: '80vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
@@ -52,13 +52,13 @@ export default async function Home() {
         </section>
 
         {/* WHAT: DESTINY (Two Column Layout) */}
-        <section style={{ display: 'flex', gap: '4rem', padding: '4rem 0', minHeight: '80vh', alignItems: 'center' }}>
+        <section className="flex-col-mobile text-center-mobile" style={{ display: 'flex', gap: '4rem', padding: '4rem 0', minHeight: '80vh', alignItems: 'center' }}>
           
           {/* Left Column: Titles */}
-          <div style={{ flex: '0 0 350px' }}>
-            <img src="/images/logo.png" alt="Mhami Logo" style={{ height: '80px', marginBottom: '4rem', objectFit: 'contain' }} />
+          <div style={{ flex: '1', minWidth: '300px' }}>
+            <img src="/images/logo.png" alt="Mhami Logo" style={{ height: '80px', marginBottom: '2rem', objectFit: 'contain' }} />
             
-            <h2 style={{ fontFamily: '"Playfair Display", "Noto Serif Thai", serif', fontSize: '6rem', color: 'var(--text-main)', lineHeight: '1', letterSpacing: '0.05em', marginBottom: '1rem' }}>WHAT</h2>
+            <h2 style={{ fontFamily: '"Playfair Display", "Noto Serif Thai", serif', fontSize: 'clamp(3rem, 10vw, 6rem)', color: 'var(--text-main)', lineHeight: '1', letterSpacing: '0.05em', marginBottom: '1rem' }}>WHAT</h2>
             
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
               <div style={{ height: '1px', width: '40px', backgroundColor: 'var(--primary)', opacity: 0.6 }}></div>
@@ -111,10 +111,10 @@ export default async function Home() {
           
           <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(to bottom, rgba(17, 10, 7, 0.4), rgba(26, 18, 13, 0.6))', zIndex: 0 }}></div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '2rem', marginBottom: '2rem', width: '100%', justifyContent: 'center', zIndex: 1 }}>
-            <div style={{ height: '1px', flex: '1', maxWidth: '300px', background: 'linear-gradient(90deg, transparent, rgba(214, 180, 124, 0.5))' }}></div>
-            <h2 style={{ fontFamily: '"Playfair Display", "Noto Serif Thai", serif', fontSize: '5rem', color: 'var(--text-main)', letterSpacing: '0.05em' }}>WHERE</h2>
-            <div style={{ height: '1px', flex: '1', maxWidth: '300px', background: 'linear-gradient(-90deg, transparent, rgba(214, 180, 124, 0.5))' }}></div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem', width: '100%', justifyContent: 'center', zIndex: 1, padding: '0 1rem' }}>
+            <div className="hidden-mobile" style={{ height: '1px', flex: '1', maxWidth: '300px', background: 'linear-gradient(90deg, transparent, rgba(214, 180, 124, 0.5))' }}></div>
+            <h2 style={{ fontFamily: '"Playfair Display", "Noto Serif Thai", serif', fontSize: 'clamp(3rem, 10vw, 5rem)', color: 'var(--text-main)', letterSpacing: '0.05em' }}>WHERE</h2>
+            <div className="hidden-mobile" style={{ height: '1px', flex: '1', maxWidth: '300px', background: 'linear-gradient(-90deg, transparent, rgba(214, 180, 124, 0.5))' }}></div>
           </div>
           
           <p style={{ fontSize: '1.2rem', color: 'var(--primary)', marginBottom: '0.5rem', zIndex: 1 }}>พื้นที่ปลอดภัยของคุณ</p>
@@ -129,10 +129,10 @@ export default async function Home() {
         {/* WHEN: ARTICLES */}
         <section style={{ padding: '6rem 0', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           
-          <div style={{ display: 'flex', alignItems: 'center', gap: '2rem', marginBottom: '2rem', width: '100%', justifyContent: 'center' }}>
-            <div style={{ height: '1px', flex: '1', maxWidth: '300px', background: 'linear-gradient(90deg, transparent, rgba(214, 180, 124, 0.5))' }}></div>
-            <h2 style={{ fontFamily: '"Playfair Display", "Noto Serif Thai", serif', fontSize: '5rem', color: 'var(--text-main)', letterSpacing: '0.05em' }}>WHEN</h2>
-            <div style={{ height: '1px', flex: '1', maxWidth: '300px', background: 'linear-gradient(-90deg, transparent, rgba(214, 180, 124, 0.5))' }}></div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem', width: '100%', justifyContent: 'center', padding: '0 1rem' }}>
+            <div className="hidden-mobile" style={{ height: '1px', flex: '1', maxWidth: '300px', background: 'linear-gradient(90deg, transparent, rgba(214, 180, 124, 0.5))' }}></div>
+            <h2 style={{ fontFamily: '"Playfair Display", "Noto Serif Thai", serif', fontSize: 'clamp(3rem, 10vw, 5rem)', color: 'var(--text-main)', letterSpacing: '0.05em' }}>WHEN</h2>
+            <div className="hidden-mobile" style={{ height: '1px', flex: '1', maxWidth: '300px', background: 'linear-gradient(-90deg, transparent, rgba(214, 180, 124, 0.5))' }}></div>
           </div>
           
           <p style={{ fontSize: '1.2rem', color: 'var(--primary)', marginBottom: '0.5rem' }}>จังหวะเวลาและคำแนะนำ</p>
@@ -159,11 +159,11 @@ export default async function Home() {
         </section>
 
         {/* WHY: THE MATRIARCH */}
-        <section style={{ display: 'flex', gap: '4rem', padding: '6rem 0', alignItems: 'center' }}>
+        <section className="flex-col-mobile text-center-mobile" style={{ display: 'flex', gap: '4rem', padding: '6rem 0', alignItems: 'center' }}>
           
           {/* Left Column: Titles */}
-          <div style={{ flex: '0 0 350px', textAlign: 'right' }}>
-            <h2 style={{ fontFamily: '"Playfair Display", "Noto Serif Thai", serif', fontSize: '6rem', color: 'var(--text-main)', lineHeight: '1', letterSpacing: '0.05em', marginBottom: '1rem' }}>WHY</h2>
+          <div style={{ flex: '1', minWidth: '300px' }}>
+            <h2 style={{ fontFamily: '"Playfair Display", "Noto Serif Thai", serif', fontSize: 'clamp(3rem, 10vw, 6rem)', color: 'var(--text-main)', lineHeight: '1', letterSpacing: '0.05em', marginBottom: '1rem' }}>WHY</h2>
             
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '1rem', marginBottom: '0.5rem' }}>
               <p style={{ fontSize: '1rem', color: 'var(--primary)', letterSpacing: '0.15em', textTransform: 'uppercase' }}>ทำไมต้องหม่ามี๊</p>
@@ -184,10 +184,10 @@ export default async function Home() {
         {/* HOW: WALL OF LOVE */}
         <section style={{ padding: '6rem 0', display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '4rem' }}>
           
-          <div style={{ display: 'flex', alignItems: 'center', gap: '2rem', marginBottom: '2rem', width: '100%', justifyContent: 'center' }}>
-            <div style={{ height: '1px', flex: '1', maxWidth: '300px', background: 'linear-gradient(90deg, transparent, rgba(214, 180, 124, 0.5))' }}></div>
-            <h2 style={{ fontFamily: '"Playfair Display", "Noto Serif Thai", serif', fontSize: '5rem', color: 'var(--text-main)', letterSpacing: '0.05em' }}>HOW</h2>
-            <div style={{ height: '1px', flex: '1', maxWidth: '300px', background: 'linear-gradient(-90deg, transparent, rgba(214, 180, 124, 0.5))' }}></div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem', width: '100%', justifyContent: 'center', padding: '0 1rem' }}>
+            <div className="hidden-mobile" style={{ height: '1px', flex: '1', maxWidth: '300px', background: 'linear-gradient(90deg, transparent, rgba(214, 180, 124, 0.5))' }}></div>
+            <h2 style={{ fontFamily: '"Playfair Display", "Noto Serif Thai", serif', fontSize: 'clamp(3rem, 10vw, 5rem)', color: 'var(--text-main)', letterSpacing: '0.05em' }}>HOW</h2>
+            <div className="hidden-mobile" style={{ height: '1px', flex: '1', maxWidth: '300px', background: 'linear-gradient(-90deg, transparent, rgba(214, 180, 124, 0.5))' }}></div>
           </div>
           
           <p style={{ fontSize: '1.2rem', color: 'var(--primary)', marginBottom: '0.5rem' }}>กำแพงแห่งความรัก</p>

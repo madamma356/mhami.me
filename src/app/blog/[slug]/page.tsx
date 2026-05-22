@@ -32,7 +32,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'linear-gradient(to bottom, rgba(26,24,22,0.1), var(--bg-main))' }}></div>
       </div>
 
-      <main style={{ padding: '0 2rem', maxWidth: '800px', margin: '-100px auto 0', position: 'relative', zIndex: 10 }}>
+      <main className="padding-mobile-sm" style={{ padding: '0 1rem', maxWidth: '800px', margin: '-100px auto 0', position: 'relative', zIndex: 10 }}>
         
         {/* Back Button */}
         <Link href="/blog" style={{ display: 'inline-block', marginBottom: '2rem', color: 'var(--primary)', textDecoration: 'none', fontSize: '0.9rem', letterSpacing: '0.05em' }}>
@@ -40,7 +40,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
         </Link>
 
         {/* Title */}
-        <h1 style={{ fontFamily: '"Playfair Display", "Noto Serif Thai", serif', fontSize: '3rem', color: 'var(--text-main)', marginBottom: '1.5rem', lineHeight: '1.3', textShadow: '0 4px 20px rgba(0,0,0,0.5)' }}>
+        <h1 style={{ fontFamily: '"Playfair Display", "Noto Serif Thai", serif', fontSize: 'clamp(2rem, 8vw, 3rem)', color: 'var(--text-main)', marginBottom: '1.5rem', lineHeight: '1.3', textShadow: '0 4px 20px rgba(0,0,0,0.5)' }}>
           {blog.title}
         </h1>
         

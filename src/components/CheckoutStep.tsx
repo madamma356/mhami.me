@@ -187,7 +187,7 @@ export default function CheckoutStep({ price, deliveryTime, selectedCards, divid
         <label style={{ display: 'block', color: 'var(--primary)', marginBottom: '1rem', fontSize: '1.1rem' }}>มีรหัสส่วนลดไหมคะลูก?</label>
         
         {appliedCoupon ? (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: 'rgba(214, 180, 124, 0.1)', border: '1px solid var(--primary)', borderRadius: '0.5rem', padding: '1rem' }}>
+          <div className="flex-col-mobile" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: 'rgba(214, 180, 124, 0.1)', border: '1px solid var(--primary)', borderRadius: '0.5rem', padding: '1rem', gap: '1rem', textAlign: 'center' }}>
             <div>
               <span style={{ color: 'var(--primary)', fontWeight: 'bold', display: 'block', marginBottom: '0.2rem' }}>รหัสที่ใช้: {appliedCoupon.code}</span>
               <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
@@ -204,7 +204,7 @@ export default function CheckoutStep({ price, deliveryTime, selectedCards, divid
           </div>
         ) : (
           <div>
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <div className="flex-col-mobile" style={{ display: 'flex', gap: '0.5rem' }}>
               <input 
                 type="text" 
                 value={couponInput}
@@ -217,7 +217,7 @@ export default function CheckoutStep({ price, deliveryTime, selectedCards, divid
                 onClick={handleApplyCoupon}
                 disabled={!couponInput.trim() || isApplyingCoupon}
                 className="cozy-button"
-                style={{ padding: '0 1.5rem', opacity: (!couponInput.trim() || isApplyingCoupon) ? 0.5 : 1, cursor: (!couponInput.trim() || isApplyingCoupon) ? 'not-allowed' : 'pointer' }}
+                style={{ padding: '0 1.5rem', opacity: (!couponInput.trim() || isApplyingCoupon) ? 0.5 : 1, cursor: (!couponInput.trim() || isApplyingCoupon) ? 'not-allowed' : 'pointer', minHeight: '45px' }}
               >
                 {isApplyingCoupon ? 'กำลังเช็ค...' : 'ใช้คูปอง'}
               </button>
