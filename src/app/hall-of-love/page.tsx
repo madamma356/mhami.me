@@ -1,9 +1,11 @@
-"use client";
-
 import React from 'react';
-import { mockReviews } from '@/lib/mockDb';
+import { prisma } from '@/lib/prisma';
 
-export default function HallOfLovePage() {
+export default async function HallOfLovePage() {
+  const dbReviews = await prisma.review.findMany({
+    where: { isVisible: true },
+    orderBy: { createdAt: 'desc' }
+  });
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       
@@ -22,7 +24,7 @@ export default function HallOfLovePage() {
         {/* Reviews Grid */}
         <section>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2rem', width: '100%' }}>
-            {mockReviews.map((review) => (
+            {dbReviews.map((review) => (
               <div key={review.id} className="healing-card mockup-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                 <p style={{ fontStyle: 'italic', color: 'var(--text-muted)', lineHeight: '1.8', fontWeight: 300 }}>"{review.text}"</p>
                 <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>

@@ -1,7 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
 import HealingRoomInput from '@/components/HealingRoomInput';
-import { mockReviews, mockArticles } from '@/lib/mockDb';
 import { prisma } from '@/lib/prisma';
 
 export default async function Home() {
@@ -10,15 +9,26 @@ export default async function Home() {
     orderBy: { createdAt: 'desc' },
     take: 3
   });
-  
-  // Use DB blogs if available, otherwise fallback to mock articles
-  const displayBlogs = dbBlogs.length > 0 ? dbBlogs.map(b => ({
+
+  const displayBlogs = dbBlogs.map(b => ({
     id: b.id,
     title: b.title,
     slug: b.slug,
     excerpt: b.content.substring(0, 150) + '...',
     imageUrl: b.imageUrl || '/images/logo.png'
-  })) : mockArticles;
+  }));
+
+  const dbReviews = await prisma.review.findMany({
+    where: { isVisible: true },
+    orderBy: { createdAt: 'desc' },
+    take: 3
+  });
+
+  const dbServices = await prisma.service.findMany({
+    where: { isActive: true },
+    orderBy: { price: 'asc' }
+  });
+  
   return (
     <div style={{ minHeight: '100vh', paddingBottom: '5rem' }}>
       
@@ -62,85 +72,37 @@ export default async function Home() {
           </div>
 
           {/* Right Column: Cards */}
-          <div style={{ flex: '1', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2rem' }}>
-            
-            {/* Card 1 */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-              <div className="healing-card mockup-card flex-1 w-full" style={{ display: 'flex', flexDirection: 'column' }}>
-                <img src="/images/service-1-new.png" alt="แสงสว่างนำทาง" className="healing-card-image" style={{ height: '220px', objectFit: 'cover' }} />
-                <h3 style={{ color: 'var(--text-main)', marginBottom: '0.2rem', fontSize: '1.4rem' }}>แสงสว่างนำทาง</h3>
-                <p style={{ color: 'var(--primary)', marginBottom: '1rem', fontSize: '1rem', fontStyle: 'italic' }}>(Guiding Light)</p>
-                <div style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', fontSize: '0.9rem', lineHeight: '1.6', flex: 1 }}>
-                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    <li>✨ 3 คำถามเน้นๆ</li>
-                    <li>✨ เปิดไพ่ 3 ใบต่อคำถาม</li>
-                    <li>✨ สำหรับคนหน้ามืดตามัว</li>
-                  </ul>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 'auto' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <span style={{ color: 'var(--text-muted)', textDecoration: 'line-through', fontSize: '0.8rem' }}>ปกติ 595.-</span>
-                    <span style={{ color: 'var(--primary)', fontWeight: 600, fontSize: '1.2rem' }}>฿395</span>
+          <div style={{ flex: '1', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
+            {dbServices.map((service) => {
+              const titleMain = service.title.split(' (')[0];
+              const titleSub = service.title.includes('(') ? `(${service.title.split(' (')[1]}` : '';
+              
+              let linkHref = '/destiny';
+              if (service.typeKey === 'PHROM_YAN') linkHref = '/consultation/life-unveiled';
+              
+              return (
+                <div key={service.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+                  <div className="healing-card mockup-card flex-1 w-full" style={{ display: 'flex', flexDirection: 'column' }}>
+                    <Link href={linkHref} style={{ textDecoration: 'none', display: 'block', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                      <img src={service.imageUrl || '/images/logo.png'} alt={titleMain} className="healing-card-image" style={{ height: '220px', objectFit: 'cover' }} />
+                      <h3 style={{ color: 'var(--text-main)', marginBottom: '0.2rem', fontSize: '1.4rem', marginTop: '1rem' }}>{titleMain}</h3>
+                      <p style={{ color: 'var(--primary)', marginBottom: '1rem', fontSize: '1rem', fontStyle: 'italic' }}>{titleSub}</p>
+                      <div style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', fontSize: '0.9rem', lineHeight: '1.6', flex: 1 }}>
+                        {service.description}
+                      </div>
+                    </Link>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 'auto' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span style={{ color: 'var(--primary)', fontWeight: 600, fontSize: '1.2rem' }}>฿{service.price.toLocaleString()}</span>
+                      </div>
+                      <Link href={linkHref} style={{ textDecoration: 'none' }}>
+                        <button className="cozy-button" style={{ padding: '0.4rem 1.5rem', fontSize: '0.8rem' }}>รับคำปรึกษา</button>
+                      </Link>
+                    </div>
                   </div>
-                  <a href="/destiny" style={{ textDecoration: 'none' }}>
-                    <button className="cozy-button" style={{ padding: '0.4rem 1.5rem', fontSize: '0.8rem' }}>รับคำปรึกษา</button>
-                  </a>
                 </div>
-              </div>
-            </div>
-
-            {/* Card 2 */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-              <div className="healing-card mockup-card flex-1 w-full" style={{ display: 'flex', flexDirection: 'column' }}>
-                <Link href="/consultation/life-unveiled" style={{ textDecoration: 'none', display: 'block' }}>
-                  <img src="/images/service-2-phromyan.png" alt="ไขความลับชีวิต" className="healing-card-image" style={{ height: '220px', objectFit: 'cover' }} />
-                  <h3 style={{ color: 'var(--text-main)', marginBottom: '0.2rem', fontSize: '1.4rem' }}>ไขความลับชีวิต</h3>
-                  <p style={{ color: 'var(--primary)', marginBottom: '1rem', fontSize: '1rem', fontStyle: 'italic' }}>(Life Unveiled)</p>
-                  <div style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', fontSize: '0.9rem', lineHeight: '1.6', flex: 1 }}>
-                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                      <li>✨ 12 ใบ ดูรวมทั้งชีวิต</li>
-                      <li>✨ สแกนกรรมทะลุปรุโปร่ง</li>
-                      <li>✨ เตรียมทิชชู่ไว้เช็ดน้ำตา</li>
-                    </ul>
-                  </div>
-                </Link>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 'auto' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <span style={{ color: 'var(--text-muted)', textDecoration: 'line-through', fontSize: '0.8rem' }}>ปกติ 895.-</span>
-                    <span style={{ color: 'var(--primary)', fontWeight: 600, fontSize: '1.2rem' }}>฿695</span>
-                  </div>
-                  <a href="/destiny" style={{ textDecoration: 'none' }}>
-                    <button className="cozy-button" style={{ padding: '0.4rem 1.5rem', fontSize: '0.8rem' }}>สู้ชีวิตต่อ</button>
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            {/* Card 3 */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-              <div className="healing-card mockup-card flex-1 w-full" style={{ display: 'flex', flexDirection: 'column' }}>
-                <img src="/images/service-3-new.png" alt="พลิกชะตาฟ้าลิขิต" className="healing-card-image" style={{ height: '220px', objectFit: 'cover' }} />
-                <h3 style={{ color: 'var(--text-main)', marginBottom: '0.2rem', fontSize: '1.4rem' }}>พลิกชะตาฟ้าลิขิต</h3>
-                <p style={{ color: 'var(--primary)', marginBottom: '1rem', fontSize: '1rem', fontStyle: 'italic' }}>(Destiny Rewrite)</p>
-                <div style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', fontSize: '0.9rem', lineHeight: '1.6', flex: 1 }}>
-                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    <li>✨ โหราศาสตร์ไทยแบบจุกๆ</li>
-                    <li>✨ หาเบอร์มงคลพลิกชีวิต</li>
-                    <li>✨ สำหรับสายมูตัวแม่</li>
-                  </ul>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 'auto' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <span style={{ color: 'var(--text-muted)', textDecoration: 'line-through', fontSize: '0.8rem' }}>ปกติ 12,695.-</span>
-                    <span style={{ color: 'var(--primary)', fontWeight: 600, fontSize: '1.2rem' }}>฿8,995</span>
-                  </div>
-                  <a href="/destiny" style={{ textDecoration: 'none' }}>
-                    <button className="cozy-button" style={{ padding: '0.4rem 1.5rem', fontSize: '0.8rem' }}>เปลี่ยนโชคชะตา</button>
-                  </a>
-                </div>
-              </div>
-            </div>
-
+              );
+            })}
           </div>
         </section>
 
@@ -232,7 +194,7 @@ export default async function Home() {
           <p style={{ fontSize: '1.1rem', color: 'var(--text-muted)', marginBottom: '4rem' }}>รีวิวจากลูกค้าที่น่ารัก</p>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem', width: '100%' }}>
-            {mockReviews.map((review) => (
+            {dbReviews.map((review) => (
               <div key={review.id} className="healing-card mockup-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                 <p style={{ fontStyle: 'italic', color: 'var(--text-muted)', lineHeight: '1.8', fontWeight: 300 }}>"{review.text}"</p>
                 <div style={{ marginTop: '2rem', fontSize: '0.9rem', color: 'var(--primary)', textAlign: 'right', fontWeight: 500 }}>

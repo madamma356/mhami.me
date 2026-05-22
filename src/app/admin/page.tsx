@@ -7,20 +7,7 @@ import { useSession, signOut } from 'next-auth/react';
 import { getAdminOrders, updateAdminPrediction, updateOrderStatus, uploadAdminPdf, getAllCustomers, updateCustomerAscendant } from '@/app/actions/admin';
 import Footer from '@/components/Footer';
 
-const mockOrders = [
-    { 
-      id: '#MH-10024', date: '26 เม.ย. 69 - 14:30', name: 'K. พลอย', lineId: 'ploy_genz', service: 'Mini Empower', price: '195.-', slipUrl: 'https://images.unsplash.com/photo-1620714223084-8fcacc6dfd8d?q=80&w=600&auto=format&fit=crop', slipStatus: 'pending', serviceStage: 'รับฝากหัวใจ', prediction: {},
-      customerInfo: { name: 'พลอยปภัส', story: 'ช่วงนี้รู้สึกสับสนเรื่องงานมากๆ ค่ะ อยากเปลี่ยนงานแต่ก็กลัวว่าที่ใหม่จะไม่ดีเท่าที่เก่า ส่วนเรื่องความรักก็เงียบเหงามาก อยากรู้ว่าครึ่งปีหลังจะมีโชคเรื่องไหนบ้างมั้ยคะ' },
-      questions: ['ปีนี้มีโอกาสจะได้เลื่อนขั้นเปลี่ยนงานไหมคะ?', 'ความรักช่วงนี้จะเป็นยังไง จะมีคนคุยใหม่ๆ เข้ามาไหม?', 'เรื่องการเงินครึ่งปีหลัง จะมีโชคลาภหรือติดขัดอะไรไหมคะ?'],
-      cards: [
-        [ { num: 1 }, { num: 15 }, { num: 28 } ],
-        [ { num: 5 }, { num: 42 }, { num: 19 } ],
-        [ { num: 11 }, { num: 33 }, { num: 7 } ]
-      ]
-    },
-    { id: '#MH-10023', date: '26 เม.ย. 69 - 13:15', name: 'K. ต้น', lineId: 'ton_1990', service: 'Destiny Rewrite', price: '8,995.-', slipUrl: 'https://images.unsplash.com/photo-1620714223084-8fcacc6dfd8d?q=80&w=600&auto=format&fit=crop', slipStatus: 'approved', serviceStage: 'กำลังเชื่อมต่อพลังงาน', prediction: {}, customerInfo: { name: 'ชนาธิป', phone: '081-234-5678', birthdate: '15/08/2533', birthtime: '09:45', birthprovince: 'กรุงเทพมหานคร', story: 'อยากเปลี่ยนเบอร์ใหม่ครับ เบอร์เดิมทำอะไรก็ติดขัด เงินเก็บไม่อยู่เลย', budget: '1,000 - 5,000 บาท', carrier: 'AIS' } },
-    { id: '#MH-10022', date: '25 เม.ย. 69 - 20:10', name: 'K. เมย์', lineId: 'maymay', service: 'Life Unveiled', price: '695.-', slipUrl: 'https://images.unsplash.com/photo-1620714223084-8fcacc6dfd8d?q=80&w=600&auto=format&fit=crop', slipStatus: 'approved', serviceStage: 'พร้อมส่งมอบความสบายใจ', prediction: {}, customerInfo: { name: 'เมธาวี', job: 'เจ้าของธุรกิจส่วนตัว', relationship: 'มีแฟน/แต่งงานแล้ว', story: 'อยากรู้ภาพรวมชีวิตในปีนี้ค่ะ ว่าจะมีโอกาสได้ขยับขยายเรื่องงานและเงินไหม แล้วก็อยากรู้เรื่องสิ่งที่ต้องระวังเป็นพิเศษค่ะ', focus: 'ภาพรวมชีวิต' } }
-];
+const mockOrders: any[] = [];
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -34,11 +21,21 @@ export default function AdminDashboard() {
   const [servicesList, setServicesList] = useState<any[]>([]);
   const [reviewsList, setReviewsList] = useState<any[]>([]);
   const [blogsList, setBlogsList] = useState<any[]>([]);
+  const [couponsList, setCouponsList] = useState<any[]>([]);
   
   const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [isBlogModalOpen, setIsBlogModalOpen] = useState(false);
+  const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<any>(null);
+
+  const [dashboardStats, setDashboardStats] = useState<any>({
+    totalSales: 0,
+    pendingSlipsCount: 0,
+    pendingPredictionsCount: 0,
+    totalCustomers: 0,
+    recentVentingCount: 0
+  });
 
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
@@ -51,10 +48,10 @@ export default function AdminDashboard() {
         if (dbOrders && dbOrders.length > 0) {
           setOrdersList(dbOrders);
         } else {
-          setOrdersList(mockOrders); // Fallback to mock data
+          setOrdersList([]); 
         }
       } catch (err) {
-        setOrdersList(mockOrders);
+        setOrdersList([]);
       } finally {
         setIsLoading(false);
       }
@@ -71,14 +68,18 @@ export default function AdminDashboard() {
 
     const fetchCMSData = async () => {
       try {
-        const [servicesRes, reviewsRes, blogsRes] = await Promise.all([
+        const [servicesRes, reviewsRes, blogsRes, couponsRes, dashRes] = await Promise.all([
           fetch('/api/admin/services'),
           fetch('/api/admin/reviews'),
-          fetch('/api/admin/blogs')
+          fetch('/api/admin/blogs'),
+          fetch('/api/admin/coupons'),
+          fetch('/api/admin/dashboard')
         ]);
         if (servicesRes.ok) setServicesList(await servicesRes.json());
         if (reviewsRes.ok) setReviewsList(await reviewsRes.json());
         if (blogsRes.ok) setBlogsList(await blogsRes.json());
+        if (couponsRes.ok) setCouponsList(await couponsRes.json());
+        if (dashRes.ok) setDashboardStats(await dashRes.json());
       } catch (e) {
         console.error("Failed to fetch CMS data", e);
       }
@@ -202,6 +203,32 @@ export default function AdminDashboard() {
     if (res.ok) setBlogsList(prev => prev.filter(b => b.id !== id));
   };
 
+  const handleSaveCoupon = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const method = editingItem?.id ? 'PUT' : 'POST';
+    const url = editingItem?.id ? `/api/admin/coupons/${editingItem.id}` : '/api/admin/coupons';
+    const res = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(editingItem)
+    });
+    const data = await res.json();
+    if (res.ok) {
+      const saved = data.coupon;
+      setCouponsList(prev => method === 'POST' ? [saved, ...prev] : prev.map(c => c.id === saved.id ? saved : c));
+      setIsCouponModalOpen(false);
+      setEditingItem(null);
+    } else {
+      alert(data.error || 'เกิดข้อผิดพลาด');
+    }
+  };
+
+  const handleDeleteCoupon = async (id: string) => {
+    if (!confirm('ยืนยันการลบคูปองนี้?')) return;
+    const res = await fetch(`/api/admin/coupons/${id}`, { method: 'DELETE' });
+    if (res.ok) setCouponsList(prev => prev.filter(c => c.id !== id));
+  };
+
 
   const handleUpdateAscendant = async (userId: string, ascendant: string) => {
     setCustomersList(prev => prev.map(c => c.id === userId ? { ...c, ascendant } : c));
@@ -242,6 +269,7 @@ export default function AdminDashboard() {
     { id: 'services', label: 'บริการพยากรณ์', icon: 'fa-magic', group: 'จัดการเนื้อหาเว็บไซต์' },
     { id: 'reviews', label: 'ระบบรีวิวลูกค้า', icon: 'fa-star', group: 'จัดการเนื้อหาเว็บไซต์' },
     { id: 'blog', label: 'บทความฮีลใจ (Blog)', icon: 'fa-pen-nib', group: 'จัดการเนื้อหาเว็บไซต์' },
+    { id: 'coupons', label: 'คูปองส่วนลด', icon: 'fa-ticket-alt', group: 'จัดการเนื้อหาเว็บไซต์' },
   ];
 
   if (!isAuthorized) {
@@ -330,19 +358,21 @@ export default function AdminDashboard() {
           {activeTab === 'dashboard' && (
             <div className="fade-in">
               {/* Stats */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '2rem', marginBottom: '3rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
                 {[
-                  { label: 'ยอดขายรวมเดือนนี้', value: '฿ 45,900', icon: 'fa-coins', color: 'var(--primary)' },
-                  { label: 'ออเดอร์รอตรวจสอบ', value: '12 คิว', icon: 'fa-clipboard-list', color: '#ffb142' },
-                  { label: 'ลูกค้าทั้งหมด', value: '1,240', icon: 'fa-users', color: 'var(--text-main)' }
+                  { label: 'ยอดขายรวมเดือนนี้', value: `฿ ${dashboardStats.totalSales.toLocaleString()}`, icon: 'fa-coins', color: 'var(--primary)' },
+                  { label: 'ออเดอร์รอตรวจสลิป', value: `${dashboardStats.pendingSlipsCount} คิว`, icon: 'fa-clipboard-list', color: '#ffb142' },
+                  { label: 'ออเดอร์รอทำนาย', value: `${dashboardStats.pendingPredictionsCount} คิว`, icon: 'fa-crystal-ball', color: '#ff6b81' },
+                  { label: 'ลูกค้าทั้งหมด', value: `${dashboardStats.totalCustomers.toLocaleString()} คน`, icon: 'fa-users', color: 'var(--text-main)' },
+                  { label: 'ข้อความระบายใหม่ (24 ชม.)', value: `${dashboardStats.recentVentingCount} ข้อความ`, icon: 'fa-envelope-open-text', color: '#33d9b2' }
                 ].map((stat, i) => (
-                  <div key={i} style={{ backgroundColor: 'rgba(26, 24, 22, 0.6)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '1rem', padding: '2rem', display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-                    <div style={{ width: '60px', height: '60px', borderRadius: '12px', background: 'rgba(214, 180, 124, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: stat.color, fontSize: '1.8rem' }}>
+                  <div key={i} style={{ backgroundColor: 'rgba(26, 24, 22, 0.6)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '1rem', padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <div style={{ width: '50px', height: '50px', borderRadius: '12px', background: 'rgba(214, 180, 124, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: stat.color, fontSize: '1.5rem', flexShrink: 0 }}>
                       <i className={`fas ${stat.icon}`}></i>
                     </div>
                     <div>
-                      <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '0.3rem' }}>{stat.label}</p>
-                      <p style={{ color: 'var(--text-main)', fontSize: '1.8rem', fontWeight: 600 }}>{stat.value}</p>
+                      <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '0.2rem', lineHeight: '1.2' }}>{stat.label}</p>
+                      <p style={{ color: 'var(--text-main)', fontSize: '1.4rem', fontWeight: 600, margin: 0 }}>{stat.value}</p>
                     </div>
                   </div>
                 ))}
@@ -692,8 +722,66 @@ export default function AdminDashboard() {
             </div>
           )}
 
+          {/* TAB: COUPONS */}
+          {activeTab === 'coupons' && (
+            <div className="fade-in">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                <h3 style={{ color: 'var(--primary)', fontSize: '1.2rem' }}>ระบบจัดการคูปองส่วนลด</h3>
+                <button 
+                  className="cozy-button filled" 
+                  onClick={() => { setEditingItem({ isActive: true, discountType: 'FIXED' }); setIsCouponModalOpen(true); }}
+                >
+                  <i className="fas fa-plus"></i> สร้างคูปองใหม่
+                </button>
+              </div>
+              
+              <div style={{ backgroundColor: 'rgba(26, 24, 22, 0.6)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '1rem', overflow: 'hidden' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', color: 'var(--text-main)', textAlign: 'left' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid rgba(214, 180, 124, 0.2)', background: 'rgba(0,0,0,0.2)' }}>
+                      <th style={{ padding: '1.5rem', color: 'var(--primary)', fontWeight: 400 }}>โค้ด</th>
+                      <th style={{ padding: '1.5rem', color: 'var(--primary)', fontWeight: 400 }}>ส่วนลด</th>
+                      <th style={{ padding: '1.5rem', color: 'var(--primary)', fontWeight: 400 }}>การใช้งาน</th>
+                      <th style={{ padding: '1.5rem', color: 'var(--primary)', fontWeight: 400 }}>สถานะ</th>
+                      <th style={{ padding: '1.5rem', color: 'var(--primary)', fontWeight: 400 }}>จัดการ</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {couponsList.map((c, i) => (
+                      <tr key={i} style={{ borderBottom: '1px solid rgba(214, 180, 124, 0.1)' }}>
+                        <td style={{ padding: '1.5rem', fontWeight: 'bold', letterSpacing: '1px' }}>{c.code}</td>
+                        <td style={{ padding: '1.5rem', color: 'var(--text-muted)' }}>
+                          {c.discountType === 'PERCENTAGE' ? `${c.discount}%` : `${c.discount} บาท`}
+                        </td>
+                        <td style={{ padding: '1.5rem', color: 'var(--text-muted)' }}>
+                          {c.usedCount} / {c.maxUses || '∞'}
+                        </td>
+                        <td style={{ padding: '1.5rem' }}>
+                          <span style={{ padding: '0.4rem 1rem', borderRadius: '2rem', fontSize: '0.8rem', backgroundColor: c.isActive ? '#33d9b220' : 'rgba(255,255,255,0.05)', color: c.isActive ? '#33d9b2' : 'var(--text-muted)' }}>
+                            {c.isActive ? 'เปิดใช้งาน' : 'ปิดการใช้งาน'}
+                          </span>
+                        </td>
+                        <td style={{ padding: '1.5rem' }}>
+                          <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <button onClick={() => { setEditingItem(c); setIsCouponModalOpen(true); }} className="cozy-button" style={{ padding: '0.4rem', fontSize: '0.9rem' }}><i className="fas fa-edit"></i></button>
+                            <button onClick={() => handleDeleteCoupon(c.id)} className="cozy-button" style={{ padding: '0.4rem', fontSize: '0.9rem', color: '#ff6b6b', borderColor: '#ff6b6b20' }}><i className="fas fa-trash"></i></button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                    {couponsList.length === 0 && (
+                      <tr>
+                        <td colSpan={5} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>ยังไม่มีข้อมูลคูปอง</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
           {/* FALLBACK (If any other tab is selected) */}
-          {!['dashboard', 'orders', 'customers', 'services', 'reviews', 'blog'].includes(activeTab) && (
+          {!['dashboard', 'orders', 'customers', 'services', 'reviews', 'blog', 'coupons'].includes(activeTab) && (
              <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '50vh', textAlign: 'center' }}>
                <div style={{ width: '80px', height: '80px', borderRadius: '50%', backgroundColor: 'rgba(214, 180, 124, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
                  <i className="fas fa-tools" style={{ fontSize: '2.5rem', color: 'var(--primary)' }}></i>
@@ -1109,6 +1197,49 @@ export default function AdminDashboard() {
               </div>
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1rem' }}>
                 <button type="button" onClick={() => setIsBlogModalOpen(false)} className="cozy-button">ยกเลิก</button>
+                <button type="submit" className="cozy-button filled">บันทึก</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {isCouponModalOpen && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.8)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
+          <div className="fade-in" style={{ backgroundColor: 'var(--bg-main)', width: '100%', maxWidth: '600px', borderRadius: '1rem', border: '1px solid rgba(214, 180, 124, 0.2)', display: 'flex', flexDirection: 'column', maxHeight: '90vh' }}>
+            <div style={{ padding: '2rem', borderBottom: '1px solid rgba(214, 180, 124, 0.1)' }}>
+              <h3 style={{ color: 'var(--primary)', margin: 0 }}>{editingItem?.id ? 'แก้ไขคูปอง' : 'สร้างคูปองใหม่'}</h3>
+            </div>
+            <form onSubmit={handleSaveCoupon} style={{ padding: '2rem', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <div>
+                <label style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '0.5rem', display: 'block' }}>โค้ดส่วนลด (เช่น NEWYEAR)</label>
+                <input type="text" value={editingItem?.code || ''} onChange={e => setEditingItem({ ...editingItem, code: e.target.value.toUpperCase() })} style={{ width: '100%', padding: '1rem', backgroundColor: 'rgba(0,0,0,0.3)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '0.5rem', color: 'var(--text-main)', textTransform: 'uppercase' }} required />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div>
+                  <label style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '0.5rem', display: 'block' }}>ประเภทส่วนลด</label>
+                  <select value={editingItem?.discountType || 'FIXED'} onChange={e => setEditingItem({ ...editingItem, discountType: e.target.value })} style={{ width: '100%', padding: '1rem', backgroundColor: 'rgba(0,0,0,0.3)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '0.5rem', color: 'var(--text-main)' }}>
+                    <option value="FIXED">ลดเป็นบาท (Fixed)</option>
+                    <option value="PERCENTAGE">ลดเป็น % (Percentage)</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '0.5rem', display: 'block' }}>จำนวนส่วนลด</label>
+                  <input type="number" value={editingItem?.discount || ''} onChange={e => setEditingItem({ ...editingItem, discount: e.target.value })} style={{ width: '100%', padding: '1rem', backgroundColor: 'rgba(0,0,0,0.3)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '0.5rem', color: 'var(--text-main)' }} required />
+                </div>
+              </div>
+              <div>
+                <label style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '0.5rem', display: 'block' }}>จำกัดจำนวนครั้งที่ใช้ (เว้นว่างไว้หากไม่จำกัด)</label>
+                <input type="number" value={editingItem?.maxUses || ''} onChange={e => setEditingItem({ ...editingItem, maxUses: e.target.value })} style={{ width: '100%', padding: '1rem', backgroundColor: 'rgba(0,0,0,0.3)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '0.5rem', color: 'var(--text-main)' }} />
+              </div>
+              <div>
+                <label style={{ color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '1rem', cursor: 'pointer' }}>
+                  <input type="checkbox" checked={editingItem?.isActive ?? true} onChange={e => setEditingItem({ ...editingItem, isActive: e.target.checked })} style={{ width: '20px', height: '20px' }} />
+                  เปิดใช้งานคูปอง (Active)
+                </label>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1rem' }}>
+                <button type="button" onClick={() => setIsCouponModalOpen(false)} className="cozy-button">ยกเลิก</button>
                 <button type="submit" className="cozy-button filled">บันทึก</button>
               </div>
             </form>

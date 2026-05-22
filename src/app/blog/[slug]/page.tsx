@@ -2,7 +2,6 @@ import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
-import { mockArticles } from '@/lib/mockDb';
 
 export default async function BlogPostPage({ params }: { params: { slug: string } }) {
   const { slug } = params;
@@ -12,21 +11,9 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
     where: { slug }
   });
 
-  // If not found in DB, check mock articles
+  // If not found in DB, return 404
   if (!blog) {
-    const mockBlog = mockArticles.find(a => a.slug === slug);
-    if (mockBlog) {
-      blog = {
-        id: mockBlog.id,
-        title: mockBlog.title,
-        slug: mockBlog.slug,
-        content: `<p style="font-size: 1.1rem; line-height: 1.8; color: var(--text-muted);">${mockBlog.excerpt}</p><p style="margin-top: 2rem; color: var(--text-muted); font-style: italic;">(เนื้อหาฉบับเต็มของบทความตัวอย่างนี้กำลังอยู่ในระหว่างการจัดทำ...)</p>`,
-        imageUrl: mockBlog.imageUrl,
-        status: 'published',
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
-    }
+    notFound();
   }
 
   if (!blog) {

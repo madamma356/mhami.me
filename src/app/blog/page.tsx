@@ -1,6 +1,5 @@
 import React from 'react';
 import Link from 'next/link';
-import { mockArticles } from '@/lib/mockDb';
 import { prisma } from '@/lib/prisma';
 
 export default async function BlogPage() {
@@ -9,14 +8,14 @@ export default async function BlogPage() {
     orderBy: { createdAt: 'desc' }
   });
   
-  const displayBlogs = dbBlogs.length > 0 ? dbBlogs.map(b => ({
+  const displayBlogs = dbBlogs.map(b => ({
     id: b.id,
     title: b.title,
     slug: b.slug,
     excerpt: b.content.substring(0, 150) + '...',
     imageUrl: b.imageUrl || '/images/logo.png',
     date: new Date(b.createdAt).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' })
-  })) : mockArticles.map(b => ({ ...b, date: 'อัปเดตล่าสุด' }));
+  }));
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       

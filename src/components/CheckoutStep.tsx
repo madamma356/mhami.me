@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import generatePayload from 'promptpay-qr';
+import QRCode from 'qrcode';
 
 interface CheckoutStepProps {
   price: string;
@@ -32,6 +34,24 @@ export default function CheckoutStep({ price, deliveryTime, selectedCards, divid
     }
     return Math.max(0, originalPrice - appliedCoupon.discount);
   }, [originalPrice, appliedCoupon]);
+
+  const [dynamicQrUrl, setDynamicQrUrl] = useState<string>('');
+  
+  useEffect(() => {
+    const generateQR = async () => {
+      try {
+        const payload = generatePayload('0963563659', { amount: finalPrice });
+        const dataUrl = await QRCode.toDataURL(payload, {
+          color: { dark: '#000000', light: '#ffffff' },
+          margin: 2
+        });
+        setDynamicQrUrl(dataUrl);
+      } catch (err) {
+        console.error('Failed to generate QR code', err);
+      }
+    };
+    generateQR();
+  }, [finalPrice]);
 
   const handleApplyCoupon = async () => {
     if (!couponInput.trim()) return;
@@ -84,13 +104,8 @@ export default function CheckoutStep({ price, deliveryTime, selectedCards, divid
     }
   };
 
-  // Determine which QR image to use based on the price
-  const getQrImage = () => {
-    if (price === '395') return '/images/qr/395.jpg';
-    if (price === '695') return '/images/qr/695.jpg';
-    if (price === '8995') return '/images/qr/8995.jpg';
-    return '';
-  };
+  // No longer using getQrImage since we dynamically generate the QR code
+
 
   return (
     <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
@@ -148,17 +163,10 @@ export default function CheckoutStep({ price, deliveryTime, selectedCards, divid
         </div>
         
         <div style={{ width: '200px', height: '200px', backgroundColor: '#fff', padding: '10px', borderRadius: '1rem', border: '2px solid var(--primary)', boxShadow: '0 0 20px rgba(214, 180, 124, 0.2)' }}>
-          {appliedCoupon ? (
-            <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#000' }}>
-              <span style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🏦</span>
-              <span style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>พร้อมเพย์ (หม่ามี๊)</span>
-              <span style={{ fontSize: '1.2rem', marginTop: '0.5rem', fontWeight: 'bold', letterSpacing: '1px' }}>0963563659</span>
-              <span style={{ fontSize: '0.8rem', color: '#666', marginTop: '0.5rem', textAlign: 'center' }}>กรุณาโอนยอด {finalPrice} บาท</span>
-            </div>
-          ) : getQrImage() ? (
-            <img src={getQrImage()} alt="PromptPay QR" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+          {dynamicQrUrl ? (
+            <img src={dynamicQrUrl} alt="PromptPay QR" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
           ) : (
-            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#666' }}>No QR</div>
+            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#666' }}>Generating...</div>
           )}
         </div>
         
