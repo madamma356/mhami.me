@@ -98,7 +98,7 @@ export default function MemberDashboard() {
       </header>
 
       {/* Main Grid */}
-      <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 350px', gap: '2rem', alignItems: 'start' }}>
+      <div className="dashboard-grid" style={{ maxWidth: '1200px', margin: '0 auto', display: 'grid', gap: '2rem', alignItems: 'start' }}>
         
         {/* Left Column (Content) */}
         <div>
@@ -163,7 +163,7 @@ export default function MemberDashboard() {
         </div>
 
         {/* Right Column (Profile) */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', position: 'sticky', top: '2rem' }}>
+        <div className="sticky-sidebar" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', position: 'sticky', top: '2rem' }}>
           
           {/* Registration Invitation Banner */}
           {!user.isRegistered && !isLoading && !isEditing && (
@@ -355,14 +355,17 @@ export default function MemberDashboard() {
           border-color: var(--primary);
           box-shadow: 0 0 10px rgba(214, 180, 124, 0.2);
         }
+        .dashboard-grid {
+          grid-template-columns: 1fr 350px;
+        }
         @media (max-width: 900px) {
           .healing-card {
             padding: 1.5rem;
           }
-          div[style*="grid-template-columns: 1fr 350px"] {
+          .dashboard-grid {
             grid-template-columns: 1fr !important;
           }
-          div[style*="position: sticky"] {
+          .sticky-sidebar {
             position: relative !important;
             top: 0 !important;
           }
