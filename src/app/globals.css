@@ -175,5 +175,13 @@ a {
   .padding-mobile-sm {
     padding: 1rem !important;
   }
+  
+  .overflow-y-auto-mobile {
+    overflow-y: auto !important;
+  }
+  
+  .overflow-visible-mobile {
+    overflow: visible !important;
+  }
 }
 

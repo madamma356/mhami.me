@@ -277,7 +277,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="flex-col-mobile" style={{
+    <div className="flex-col-mobile overflow-y-auto-mobile" style={{
       position: 'fixed',
       top: '90px', left: 0, right: 0, bottom: 0,
       backgroundColor: 'transparent',
@@ -301,7 +301,7 @@ export default function AdminDashboard() {
           <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginTop: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Admin Control Panel</p>
         </div>
 
-        <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem 0' }}>
+        <div className="overflow-visible-mobile" style={{ flex: 1, overflowY: 'auto', padding: '1.5rem 0' }}>
           <div style={{ padding: '0 2rem 0.5rem', fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>ระบบจัดการหลัก</div>
           {navItems.filter(item => item.group === 'ระบบจัดการหลัก').map(item => (
             <button
@@ -350,9 +350,9 @@ export default function AdminDashboard() {
       </aside>
 
       {/* Main Content Area */}
-      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: 'transparent' }}>
+      <main className="h-auto-mobile" style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: 'transparent' }}>
         {/* Admin Header removed to prevent duplication with Main Navigation */}        {/* Scrollable Content */}
-        <div className="padding-mobile-sm" style={{ flex: 1, overflowY: 'auto', padding: '3rem' }}>
+        <div className="padding-mobile-sm overflow-visible-mobile" style={{ flex: 1, overflowY: 'auto', padding: '3rem' }}>
           
           {/* TAB: DASHBOARD */}
           {activeTab === 'dashboard' && (
