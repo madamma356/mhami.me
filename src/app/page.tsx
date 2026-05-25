@@ -28,6 +28,12 @@ export default async function Home() {
     where: { isActive: true },
     orderBy: { price: 'asc' }
   });
+
+  const originalPriceMap: Record<string, number> = {
+    'THREE_QUESTIONS': 595,
+    'PHROM_YAN': 895,
+    'CHANGE_DESTINY': 12695
+  };
   
   return (
     <div style={{ minHeight: '100vh', paddingBottom: '5rem' }}>
@@ -88,11 +94,20 @@ export default async function Home() {
                       <h3 style={{ color: 'var(--text-main)', marginBottom: '0.2rem', fontSize: '1.4rem', marginTop: '1rem' }}>{titleMain}</h3>
                       <p style={{ color: 'var(--primary)', marginBottom: '1rem', fontSize: '1rem', fontStyle: 'italic' }}>{titleSub}</p>
                       <div style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', fontSize: '0.9rem', lineHeight: '1.6', flex: 1 }}>
-                        {service.description}
+                        <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                          {service.description?.split('\n').map((line, i) => (
+                            <li key={i}>{line}</li>
+                          ))}
+                        </ul>
                       </div>
                     </Link>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 'auto' }}>
                       <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        {originalPriceMap[service.typeKey] && (
+                          <span style={{ color: 'var(--text-muted)', textDecoration: 'line-through', fontSize: '0.8rem' }}>
+                            ปกติ {originalPriceMap[service.typeKey].toLocaleString()}.-
+                          </span>
+                        )}
                         <span style={{ color: 'var(--primary)', fontWeight: 600, fontSize: '1.2rem' }}>฿{service.price.toLocaleString()}</span>
                       </div>
                       <Link href={linkHref} style={{ textDecoration: 'none' }}>
