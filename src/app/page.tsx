@@ -89,7 +89,7 @@ export default async function Home() {
               return (
                 <div key={service.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
                   <div className="healing-card mockup-card flex-1 w-full" style={{ display: 'flex', flexDirection: 'column' }}>
-                    <Link href={linkHref} style={{ textDecoration: 'none', display: 'block', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                    <Link href={linkHref} style={{ textDecoration: 'none', flex: 1, display: 'flex', flexDirection: 'column' }}>
                       <img src={service.imageUrl || '/images/logo.png'} alt={titleMain} className="healing-card-image" style={{ height: '220px', objectFit: 'cover' }} />
                       <h3 style={{ color: 'var(--text-main)', marginBottom: '0.2rem', fontSize: '1.4rem', marginTop: '1rem' }}>{titleMain}</h3>
                       <p style={{ color: 'var(--primary)', marginBottom: '1rem', fontSize: '1rem', fontStyle: 'italic' }}>{titleSub}</p>

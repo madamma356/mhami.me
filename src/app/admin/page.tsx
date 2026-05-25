@@ -11,6 +11,7 @@ const mockOrders: any[] = [];
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [viewingSlipOrder, setViewingSlipOrder] = useState<any>(null);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
@@ -277,24 +278,63 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="flex-col-mobile overflow-y-auto-mobile" style={{
+    <div style={{
       position: 'fixed',
-      top: '90px', left: 0, right: 0, bottom: 0,
-      backgroundColor: 'transparent',
+      top: '0', left: 0, right: 0, bottom: 0,
+      backgroundColor: 'var(--background)',
       zIndex: 10,
       display: 'flex',
+      flexDirection: 'column',
       overflow: 'hidden'
     }}>
-      {/* Sidebar */}
-      <aside className="w-full-mobile h-auto-mobile border-none-mobile" style={{
-        width: '280px',
-        backgroundColor: 'rgba(26, 24, 22, 0.95)',
-        borderRight: '1px solid rgba(214, 180, 124, 0.1)',
-        backdropFilter: 'blur(20px)',
+      
+      {/* Mobile Header (Admin) */}
+      <div className="hidden-desktop" style={{
         display: 'flex',
-        flexDirection: 'column'
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '1rem 1.5rem',
+        backgroundColor: 'rgba(26, 24, 22, 0.95)',
+        borderBottom: '1px solid rgba(214, 180, 124, 0.1)',
+        backdropFilter: 'blur(10px)',
+        zIndex: 50
       }}>
-        <div style={{ padding: '2rem', textAlign: 'center', borderBottom: '1px solid rgba(214, 180, 124, 0.1)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <img src="/images/logo.png" alt="Mhami Logo" style={{ height: '30px', objectFit: 'contain' }} />
+          <span style={{ color: 'var(--primary)', fontFamily: '"Playfair Display", serif', fontSize: '1.2rem' }}>Admin</span>
+        </div>
+        <button 
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          style={{ background: 'none', border: 'none', color: 'var(--primary)', fontSize: '1.5rem', cursor: 'pointer' }}
+        >
+          <i className={isSidebarOpen ? "fas fa-times" : "fas fa-bars"}></i>
+        </button>
+      </div>
+
+      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+        {/* Sidebar Overlay for Mobile */}
+        {isSidebarOpen && (
+          <div 
+            className="hidden-desktop"
+            onClick={() => setIsSidebarOpen(false)}
+            style={{
+              position: 'fixed', top: '60px', left: 0, right: 0, bottom: 0,
+              backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 40
+            }}
+          />
+        )}
+
+        {/* Sidebar */}
+        <aside className={`admin-sidebar ${isSidebarOpen ? 'open' : ''}`} style={{
+          width: '280px',
+          backgroundColor: 'rgba(26, 24, 22, 0.95)',
+          borderRight: '1px solid rgba(214, 180, 124, 0.1)',
+          backdropFilter: 'blur(20px)',
+          display: 'flex',
+          flexDirection: 'column',
+          zIndex: 45
+        }}>
+        <div className="hidden-mobile" style={{ padding: '2rem', textAlign: 'center', borderBottom: '1px solid rgba(214, 180, 124, 0.1)' }}>
           <Link href="/" style={{ textDecoration: 'none', display: 'block' }}>
             <img src="/images/logo.png" alt="Mhami Logo" style={{ height: '45px', objectFit: 'contain', margin: '0 auto', display: 'block' }} />
           </Link>
@@ -306,7 +346,7 @@ export default function AdminDashboard() {
           {navItems.filter(item => item.group === 'ระบบจัดการหลัก').map(item => (
             <button
               key={item.id}
-              onClick={() => setActiveTab(item.id)}
+              onClick={() => { setActiveTab(item.id); setIsSidebarOpen(false); }}
               style={{
                 width: '100%', textAlign: 'left', padding: '1rem 2rem', background: activeTab === item.id ? 'rgba(214, 180, 124, 0.1)' : 'transparent',
                 border: 'none', borderLeft: activeTab === item.id ? '4px solid var(--primary)' : '4px solid transparent',
@@ -323,7 +363,7 @@ export default function AdminDashboard() {
           {navItems.filter(item => item.group === 'จัดการเนื้อหาเว็บไซต์').map(item => (
             <button
               key={item.id}
-              onClick={() => setActiveTab(item.id)}
+              onClick={() => { setActiveTab(item.id); setIsSidebarOpen(false); }}
               style={{
                 width: '100%', textAlign: 'left', padding: '1rem 2rem', background: activeTab === item.id ? 'rgba(214, 180, 124, 0.1)' : 'transparent',
                 border: 'none', borderLeft: activeTab === item.id ? '4px solid var(--primary)' : '4px solid transparent',
@@ -350,9 +390,9 @@ export default function AdminDashboard() {
       </aside>
 
       {/* Main Content Area */}
-      <main className="h-auto-mobile" style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: 'transparent' }}>
-        {/* Admin Header removed to prevent duplication with Main Navigation */}        {/* Scrollable Content */}
-        <div className="padding-mobile-sm overflow-visible-mobile" style={{ flex: 1, overflowY: 'auto', padding: '3rem' }}>
+      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: 'transparent', overflow: 'hidden' }}>
+        {/* Scrollable Content */}
+        <div className="padding-mobile-sm" style={{ flex: 1, overflowY: 'auto', padding: '3rem' }}>
           
           {/* TAB: DASHBOARD */}
           {activeTab === 'dashboard' && (
@@ -1247,6 +1287,9 @@ export default function AdminDashboard() {
         </div>
       )}
 
+      {/* End flex wrapper */}
+      </div>
+
       <style dangerouslySetInnerHTML={{__html: `
         .fade-in {
           animation: fadeIn 0.4s ease-out forwards;
@@ -1254,6 +1297,23 @@ export default function AdminDashboard() {
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(10px); }
           to { opacity: 1; transform: translateY(0); }
+        }
+        .admin-sidebar {
+          transition: transform 0.3s ease;
+        }
+        @media (max-width: 768px) {
+          .admin-sidebar {
+            position: fixed;
+            top: 60px;
+            bottom: 0;
+            left: 0;
+            transform: translateX(-100%);
+            width: 80% !important;
+            max-width: 320px;
+          }
+          .admin-sidebar.open {
+            transform: translateX(0);
+          }
         }
       `}} />
     </div>
