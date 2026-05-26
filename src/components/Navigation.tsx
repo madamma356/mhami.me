@@ -13,6 +13,11 @@ export default function Navigation() {
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // Hide global navigation on admin pages
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
+
   // Handle scroll effect
   useEffect(() => {
     const handleScroll = () => {
