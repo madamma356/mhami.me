@@ -18,6 +18,11 @@ export const authOptions: NextAuthOptions = {
           bot_prompt: 'aggressive'
         }
       },
+      client: {
+        id_token_signed_response_alg: 'HS256',
+        clockTolerance: 300 // 5 minutes tolerance to fix id_token iat/exp issues
+      },
+      checks: ['state'], // Fallback to state only to avoid PKCE cookie issues on Safari
       profile(profile) {
         return {
           id: profile.sub,
