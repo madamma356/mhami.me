@@ -59,8 +59,39 @@ export default function CardPicker({ maxCards, onComplete, title, subtitle }: Ca
   };
 
   return (
-    <div style={{ backgroundColor: 'rgba(26, 24, 22, 0.6)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '1rem', padding: '2rem', backdropFilter: 'blur(10px)', marginBottom: '2rem' }}>
+    <div className="card-picker-container">
       <style>{`
+        .card-picker-container {
+          background-color: rgba(26, 24, 22, 0.6);
+          border: 1px solid rgba(214, 180, 124, 0.2);
+          border-radius: 1rem;
+          padding: 2rem;
+          backdrop-filter: blur(10px);
+          margin-bottom: 2rem;
+        }
+        .card-picker-inner {
+          padding: 1.5rem;
+          background-color: rgba(255, 255, 255, 0.02);
+          border-radius: 1rem;
+          border: 1px solid rgba(214, 180, 124, 0.05);
+        }
+        .card-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
+          gap: 0.5rem;
+        }
+        @media (max-width: 768px) {
+          .card-picker-container {
+            padding: 1rem;
+          }
+          .card-picker-inner {
+            padding: 0.5rem;
+          }
+          .card-grid {
+            grid-template-columns: repeat(10, 1fr);
+            gap: 0.2rem;
+          }
+        }
         @keyframes mysticShuffleLeft {
           0% { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 1; z-index: 1; }
           50% { transform: translate3d(-15px, -5px, 10px) rotate(-8deg) scale(0.9); opacity: 0.7; z-index: 10; }
@@ -100,8 +131,8 @@ export default function CardPicker({ maxCards, onComplete, title, subtitle }: Ca
       </div>
 
       {/* Card Grid */}
-      <div style={{ padding: '1.5rem', backgroundColor: 'rgba(255, 255, 255, 0.02)', borderRadius: '1rem', border: '1px solid rgba(214, 180, 124, 0.05)' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(45px, 1fr))', gap: '0.5rem' }}>
+      <div className="card-picker-inner">
+        <div className="card-grid">
           {cardsOrder.map((cardIndex, index) => {
             const selectedOrderIndex = selected.indexOf(cardIndex);
             const isSelected = selectedOrderIndex !== -1;
@@ -135,7 +166,7 @@ export default function CardPicker({ maxCards, onComplete, title, subtitle }: Ca
                 <img src="/images/card-back.png" alt="Card Back" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 {isSelected && (
                   <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(26, 24, 22, 0.6)', backdropFilter: 'blur(2px)' }}>
-                    <span style={{ color: 'var(--primary)', fontSize: '1.5rem', fontWeight: 'bold', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>{selectedOrder}</span>
+                    <span style={{ color: 'var(--primary)', fontSize: 'clamp(0.8rem, 3vw, 1.5rem)', fontWeight: 'bold', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>{selectedOrder}</span>
                   </div>
                 )}
               </button>
