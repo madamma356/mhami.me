@@ -2,6 +2,10 @@ import NextAuth, { NextAuthOptions } from "next-auth"
 import LineProvider from "next-auth/providers/line"
 import { prisma } from "@/lib/prisma"
 
+// Force correct URL in production to prevent OAuthCallback error if Railway env is stale
+process.env.NEXTAUTH_URL = "https://mhami.me"
+process.env.NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET || "mhami_super_secret_fallback_key_2026"
+
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET || "mhami_super_secret_fallback_key_2026",
   providers: [
