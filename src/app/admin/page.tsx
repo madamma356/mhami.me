@@ -1157,8 +1157,27 @@ export default function AdminDashboard() {
                 <input type="number" value={editingItem?.price || 0} onChange={e => setEditingItem({ ...editingItem, price: e.target.value })} style={{ width: '100%', padding: '1rem', backgroundColor: 'rgba(0,0,0,0.3)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '0.5rem', color: 'var(--text-main)' }} required />
               </div>
               <div>
-                <label style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '0.5rem', display: 'block' }}>ลิงก์รูปภาพประกอบ (Image URL)</label>
-                <input type="text" value={editingItem?.imageUrl || ''} onChange={e => setEditingItem({ ...editingItem, imageUrl: e.target.value })} style={{ width: '100%', padding: '1rem', backgroundColor: 'rgba(0,0,0,0.3)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '0.5rem', color: 'var(--text-main)' }} />
+                <label style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '0.5rem', display: 'block' }}>รูปภาพประกอบ (อัปโหลดรูปภาพใหม่)</label>
+                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                  {editingItem?.imageUrl && (
+                    <img src={editingItem.imageUrl} alt="Preview" style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '0.5rem', border: '1px solid var(--primary)' }} />
+                  )}
+                  <input 
+                    type="file" 
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                          setEditingItem({ ...editingItem, imageUrl: reader.result as string });
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }} 
+                    style={{ width: '100%', padding: '0.8rem', backgroundColor: 'rgba(0,0,0,0.3)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '0.5rem', color: 'var(--text-main)' }} 
+                  />
+                </div>
               </div>
               <div>
                 <label style={{ color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '1rem', cursor: 'pointer' }}>
@@ -1225,8 +1244,27 @@ export default function AdminDashboard() {
                 <textarea rows={10} value={editingItem?.content || ''} onChange={e => setEditingItem({ ...editingItem, content: e.target.value })} style={{ width: '100%', padding: '1rem', backgroundColor: 'rgba(0,0,0,0.3)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '0.5rem', color: 'var(--text-main)', resize: 'vertical' }} required></textarea>
               </div>
               <div>
-                <label style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '0.5rem', display: 'block' }}>ลิงก์รูปภาพหน้าปก (Cover Image URL)</label>
-                <input type="text" value={editingItem?.imageUrl || ''} onChange={e => setEditingItem({ ...editingItem, imageUrl: e.target.value })} style={{ width: '100%', padding: '1rem', backgroundColor: 'rgba(0,0,0,0.3)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '0.5rem', color: 'var(--text-main)' }} />
+                <label style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '0.5rem', display: 'block' }}>รูปภาพหน้าปก (อัปโหลดรูปภาพใหม่)</label>
+                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                  {editingItem?.imageUrl && (
+                    <img src={editingItem.imageUrl} alt="Preview" style={{ width: '80px', height: '60px', objectFit: 'cover', borderRadius: '0.5rem', border: '1px solid var(--primary)' }} />
+                  )}
+                  <input 
+                    type="file" 
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                          setEditingItem({ ...editingItem, imageUrl: reader.result as string });
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }} 
+                    style={{ width: '100%', padding: '0.8rem', backgroundColor: 'rgba(0,0,0,0.3)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '0.5rem', color: 'var(--text-main)' }} 
+                  />
+                </div>
               </div>
               <div>
                 <label style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '0.5rem', display: 'block' }}>สถานะ (Status)</label>
