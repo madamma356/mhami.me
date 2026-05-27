@@ -46,8 +46,18 @@ function LoginContent() {
           </p>
 
           {error && (
-            <div style={{ backgroundColor: 'rgba(255,0,0,0.1)', border: '1px solid red', padding: '1rem', borderRadius: '0.5rem', marginBottom: '1.5rem', color: 'white' }}>
-              <strong>พบปัญหาการล็อกอิน:</strong> {error}
+            <div style={{ backgroundColor: 'rgba(255,0,0,0.1)', border: '1px solid red', padding: '1rem', borderRadius: '0.5rem', marginBottom: '1.5rem', color: 'white', textAlign: 'left', fontSize: '0.9rem' }}>
+              <strong>พบปัญหาการล็อกอิน:</strong> 
+              {error === 'OAuthCallback' || error === 'Callback' ? (
+                <div style={{ marginTop: '0.5rem' }}>
+                  <p style={{ margin: '0 0 0.5rem 0' }}>ระบบไม่สามารถยืนยันตัวตนได้ (คุกกี้สูญหายระหว่างสลับแอป)</p>
+                  <p style={{ margin: 0, color: 'var(--primary)' }}>
+                    <strong>วิธีแก้สำหรับ iPhone:</strong> กรุณากดคัดลอกลิงก์ mhami.me ไปเปิดในแอป <strong>Safari</strong> โดยตรง แล้วกดเข้าสู่ระบบอีกครั้งค่ะ
+                  </p>
+                </div>
+              ) : (
+                <span style={{ marginLeft: '0.5rem' }}>{error}</span>
+              )}
             </div>
           )}
 

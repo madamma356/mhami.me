@@ -22,7 +22,7 @@ export const authOptions: NextAuthOptions = {
         id_token_signed_response_alg: 'HS256',
         clockTolerance: 300 // 5 minutes tolerance to fix id_token iat/exp issues
       },
-      checks: ['none'], // Bypass state/pkce checks completely to allow Chrome -> LINE App -> Safari cross-browser flow on iOS
+      checks: ['state'], // Reverting to state because openid-client throws TypeError if state is returned but not checked.
       profile(profile) {
         return {
           id: profile.sub,
