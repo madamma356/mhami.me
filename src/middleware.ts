@@ -23,5 +23,12 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  // 3. Hack for iOS Chrome -> LINE -> Safari OAuth flow
+  // Remove 'state' from the callback URL so openid-client doesn't throw a TypeError when checks: ['none'] is used
+  if (url.pathname === '/api/auth/callback/line' && url.searchParams.has('state')) {
+    url.searchParams.delete('state');
+    return NextResponse.rewrite(url);
+  }
+
   return NextResponse.next();
 }
