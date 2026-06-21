@@ -27,7 +27,7 @@ export function middleware(request: NextRequest) {
   // Remove 'state' from the callback URL so openid-client doesn't throw a TypeError when checks: ['none'] is used
   if (url.pathname === '/api/auth/callback/line' && url.searchParams.has('state')) {
     url.searchParams.delete('state');
-    return NextResponse.rewrite(url);
+    return NextResponse.redirect(url);
   }
 
   return NextResponse.next();
