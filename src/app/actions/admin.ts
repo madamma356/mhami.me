@@ -63,12 +63,20 @@ export async function getAdminOrders() {
         }
       }
 
+      let lineId = order.contactInfo || '-';
+      if (order.user?.email && order.user.email.endsWith('@line.dummy')) {
+        lineId = order.user.email.replace('@line.dummy', '');
+      } else {
+        const lineAccount = (order.user as any)?.accounts?.find((a: any) => a.provider === 'line');
+        if (lineAccount) lineId = lineAccount.providerAccountId;
+      }
+
       return {
         id: order.orderNumber, // e.g. ORD-001
         dbId: order.id,
         date: order.createdAt.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' }),
         name: order.user?.name || 'ลูกค้า',
-        lineId: (order.user as any)?.accounts?.find((a: any) => a.provider === 'line')?.providerAccountId || order.contactInfo || '-',
+        lineId: lineId,
         service: serviceName,
         price: `${order.pricePaid}.-`,
         slipUrl: order.slipUrl || 'https://images.unsplash.com/photo-1620714223084-8fcacc6dfd8d?q=80&w=600&auto=format&fit=crop',
@@ -142,13 +150,25 @@ export async function updateOrderStatus(dbId: string, slipStatus: string, servic
       }
     });
 
+    // Determine LINE account ID from email (dummy setup) or Account table
+    let providerAccountId: string | null = null;
+    const orderUser = await prisma.user.findUnique({
+      where: { id: order.userId },
+      include: { accounts: true }
+    });
+    
+    if (orderUser) {
+      if (orderUser.email && orderUser.email.endsWith('@line.dummy')) {
+        providerAccountId = orderUser.email.replace('@line.dummy', '');
+      } else {
+        const account = orderUser.accounts.find(a => a.provider === 'line');
+        if (account) providerAccountId = account.providerAccountId;
+      }
+    }
+
     if (slipStatus === 'rejected') {
       try {
-        const account = await prisma.account.findFirst({
-          where: { userId: order.userId, provider: 'line' }
-        });
-        
-        if (account && account.providerAccountId) {
+        if (providerAccountId) {
           const reuploadUrl = `${process.env.NEXTAUTH_URL || 'https://mhami.me'}/member`;
           const messages = [
             {
@@ -160,25 +180,21 @@ export async function updateOrderStatus(dbId: string, slipStatus: string, servic
               text: reuploadUrl
             }
           ];
-          await sendLinePushNotification(account.providerAccountId, messages);
+          await sendLinePushNotification(providerAccountId, messages);
         }
       } catch (err) {
         console.error("Failed to send slip rejection notification:", err);
       }
     } else if (slipStatus === 'approved') {
       try {
-        const account = await prisma.account.findFirst({
-          where: { userId: order.userId, provider: 'line' }
-        });
-        
-        if (account && account.providerAccountId) {
+        if (providerAccountId) {
           const messages = [
             {
               type: "text",
               text: `ยอดเงินของคุณลูก (ออเดอร์ ${order.orderNumber}) ได้รับการตรวจสอบและอนุมัติเรียบร้อยแล้วค่ะ ✨\n\nโปรดรอรับคำทำนายจากหม่ามี๊ได้เลยนะคะ 🙏`
             }
           ];
-          await sendLinePushNotification(account.providerAccountId, messages);
+          await sendLinePushNotification(providerAccountId, messages);
         }
       } catch (err) {
         console.error("Failed to send slip approval notification:", err);
