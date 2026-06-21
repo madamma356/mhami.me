@@ -17,11 +17,11 @@ export async function getAdminOrders() {
     // Map Prisma models to the UI shape expected by the frontend
     return orders.map(order => {
       // Parse metadata if exists
-      let customerInfo = {};
+      let customerInfo: any = {};
       if (order.metadata) {
-        try { customerInfo = JSON.parse(order.metadata); } catch(e) {}
+        try { customerInfo = JSON.parse(order.metadata) || {}; } catch(e) {}
       } else if (order.user?.profileData) {
-        try { customerInfo = JSON.parse(order.user.profileData); } catch(e) {}
+        try { customerInfo = JSON.parse(order.user.profileData) || {}; } catch(e) {}
       }
 
       // Try to construct a readable prediction format from readings
