@@ -169,8 +169,7 @@ export async function getAllCustomers() {
     const users = await prisma.user.findMany({
       include: {
         orders: true
-      },
-      orderBy: { createdAt: 'desc' }
+      }
     });
 
     return users.map(user => {
@@ -192,7 +191,7 @@ export async function getAllCustomers() {
         nickname: profileData.nickname || '',
         contact: profileData.phone || user.email || '-',
         lineId: profileData.lineId || '-',
-        date: user.createdAt ? user.createdAt.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' }) : '-',
+        date: user.orders && user.orders.length > 0 ? user.orders[0].createdAt.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' }) : '-',
         orders: ordersCount,
         status: status,
         statusColor: statusColor,
