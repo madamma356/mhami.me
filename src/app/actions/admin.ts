@@ -47,6 +47,21 @@ export async function getAdminOrders() {
       if (order.type === 'PHROM_YAN') serviceName = 'Life Unveiled';
       if (order.type === 'CHANGE_DESTINY') serviceName = 'Destiny Rewrite';
 
+      let formattedCards: any[] = [];
+      if (customerInfo.selectedCards && Array.isArray(customerInfo.selectedCards)) {
+        if (serviceName === 'Mini Empower' || serviceName === 'Destiny Rewrite') {
+          // Group into arrays of 3 cards for each question
+          formattedCards = [
+            customerInfo.selectedCards.slice(0, 3).map((n: number) => ({ num: n + 1 })),
+            customerInfo.selectedCards.slice(3, 6).map((n: number) => ({ num: n + 1 })),
+            customerInfo.selectedCards.slice(6, 9).map((n: number) => ({ num: n + 1 }))
+          ];
+        } else if (serviceName === 'Life Unveiled') {
+          // Flat array of 12 cards
+          formattedCards = customerInfo.selectedCards.map((n: number) => ({ num: n + 1 }));
+        }
+      }
+
       return {
         id: order.orderNumber, // e.g. ORD-001
         dbId: order.id,
@@ -64,7 +79,7 @@ export async function getAdminOrders() {
           ...customerInfo
         },
         questions: order.questions || [],
-        cards: [] // If we want to store drawn cards
+        cards: formattedCards
       };
     });
   } catch (error) {

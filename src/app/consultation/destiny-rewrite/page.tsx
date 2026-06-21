@@ -212,7 +212,7 @@ export default function DestinyRewritePage() {
                   const result = await createOrder({
                     serviceType: 'CHANGE_DESTINY',
                     slipBase64: data.fileBase64 || undefined,
-                    pricePaid: data.discount !== undefined ? Math.max(0, 8995 - data.discount) : 8995,
+                    pricePaid: data.finalPrice,
                     customerInfo: {
                       name: profileName,
                       phone,

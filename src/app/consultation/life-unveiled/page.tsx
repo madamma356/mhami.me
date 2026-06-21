@@ -198,7 +198,7 @@ export default function LifeUnveiledPage() {
                 const result = await createOrder({
                   serviceType: 'PHROM_YAN',
                   slipBase64: data.fileBase64 || undefined,
-                  pricePaid: data.discount !== undefined ? Math.max(0, 695 - data.discount) : 695,
+                  pricePaid: data.finalPrice,
                   customerInfo: {
                     name: profileName,
                     career,

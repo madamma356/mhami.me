@@ -10,7 +10,7 @@ interface CheckoutStepProps {
   qrImage?: string;
   selectedCards?: number[];
   dividerEvery?: number;
-  onSubmit: (data: { fileBase64: string | null; contact: string; couponCode?: string; discount?: number }) => Promise<void>;
+  onSubmit: (data: { fileBase64: string | null; contact: string; couponCode?: string; discount?: number; finalPrice: number }) => Promise<void>;
 }
 
 export default function CheckoutStep({ price, deliveryTime, selectedCards, dividerEvery, onSubmit }: CheckoutStepProps) {
@@ -97,7 +97,8 @@ export default function CheckoutStep({ price, deliveryTime, selectedCards, divid
         fileBase64: base64File, 
         contact: 'อ่านในระบบ', 
         couponCode: appliedCoupon?.code, 
-        discount: appliedCoupon?.discount 
+        discount: appliedCoupon?.discount,
+        finalPrice: finalPrice
       });
     } finally {
       setIsSubmitting(false);

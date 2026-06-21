@@ -211,7 +211,7 @@ export default function AwarenessPage() {
                 const result = await createOrder({
                   serviceType: 'THREE_QUESTIONS',
                   slipBase64: data.fileBase64 || undefined,
-                  pricePaid: data.discount !== undefined ? Math.max(0, 395 - data.discount) : 395,
+                  pricePaid: data.finalPrice,
                   customerInfo: {
                     name: profileName,
                     story,
