@@ -913,9 +913,25 @@ export default function AdminDashboard() {
                 <div style={{ flex: '0 0 300px', backgroundColor: 'rgba(214, 180, 124, 0.05)', borderRadius: '1rem', border: '1px solid rgba(214, 180, 124, 0.2)', overflow: 'hidden' }}>
                   <div style={{ padding: '1rem', backgroundColor: 'rgba(0,0,0,0.4)', color: 'var(--primary)', fontWeight: 'bold', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span><i className="fas fa-file-invoice-dollar" style={{ marginRight: '0.5rem' }}></i> สลิปโอนเงิน</span>
-                    <span style={{ fontSize: '0.8rem', padding: '0.2rem 0.6rem', borderRadius: '1rem', backgroundColor: selectedOrder.slipStatus === 'pending' ? '#ffb14230' : selectedOrder.slipStatus === 'approved' ? '#33d9b230' : '#ff6b6b30', color: selectedOrder.slipStatus === 'pending' ? '#ffb142' : selectedOrder.slipStatus === 'approved' ? '#33d9b2' : '#ff6b6b' }}>
-                      {selectedOrder.slipStatus === 'pending' ? 'รอตรวจ' : selectedOrder.slipStatus === 'approved' ? 'ถูกต้อง' : 'ไม่ถูกต้อง'}
-                    </span>
+                    <select 
+                      value={selectedOrder.slipStatus}
+                      onChange={(e) => {
+                        setSelectedOrder({...selectedOrder, slipStatus: e.target.value});
+                        updateOrderStatusLocal(selectedOrder.dbId, e.target.value, selectedOrder.serviceStage);
+                      }}
+                      style={{ 
+                        backgroundColor: 'rgba(26, 24, 22, 0.8)', 
+                        color: 'var(--text-main)', 
+                        border: '1px solid rgba(214, 180, 124, 0.3)', 
+                        borderRadius: '0.5rem', 
+                        padding: '0.3rem 0.5rem',
+                        fontSize: '0.8rem'
+                      }}
+                    >
+                      <option value="pending">รอตรวจ</option>
+                      <option value="approved">ถูกต้อง</option>
+                      <option value="rejected">ไม่ถูกต้อง</option>
+                    </select>
                   </div>
                   <div style={{ height: '400px', backgroundColor: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <img src={selectedOrder.slipUrl} alt="Slip" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />

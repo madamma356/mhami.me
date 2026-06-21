@@ -127,10 +127,16 @@ export async function updateOrderStatus(dbId: string, slipStatus: string, servic
     if (serviceStage === 'กำลังเชื่อมต่อพลังงาน') newStatus = 'PROCESSING';
     if (serviceStage === 'พร้อมส่งมอบความสบายใจ') newStatus = 'COMPLETED';
 
+    // Map UI statuses back to DB statuses
+    let dbSlipStatus = slipStatus;
+    if (slipStatus === 'approved') dbSlipStatus = 'passed';
+    if (slipStatus === 'rejected') dbSlipStatus = 'failed';
+    if (slipStatus === 'pending') dbSlipStatus = 'unchecked';
+
     const order = await prisma.order.update({
       where: { id: dbId },
       data: {
-        slipStatus,
+        slipStatus: dbSlipStatus,
         status: newStatus
       }
     });
