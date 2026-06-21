@@ -20,6 +20,7 @@ export default function MemberDashboard() {
     province: '-',
     phone: '-',
     ascendant: '',
+    cutoffType: '06:00',
     isRegistered: true
   });
 
@@ -324,6 +325,24 @@ export default function MemberDashboard() {
                   style={{ width: '100%', opacity: user.province ? 0.6 : 1, cursor: user.province ? 'not-allowed' : 'text' }}
                   disabled={!!user.province}
                 />
+              </div>
+              <div>
+                <label style={{ color: 'var(--text-muted)', fontSize: '0.85rem', display: 'block', marginBottom: '0.3rem' }}>
+                  การตัดเวลาเกิด {user.dob && <i className="fas fa-lock" style={{ marginLeft: '0.3rem', fontSize: '0.7rem' }}></i>}
+                </label>
+                <select
+                  value={editForm.cutoffType || '06:00'}
+                  onChange={(e) => setEditForm({...editForm, cutoffType: e.target.value})}
+                  className="cozy-input"
+                  style={{ width: '100%', opacity: user.dob ? 0.6 : 1, cursor: user.dob ? 'not-allowed' : 'pointer', backgroundColor: 'rgba(0,0,0,0.3)', color: 'var(--text-main)', padding: '0.8rem', borderRadius: '0.5rem', border: '1px solid rgba(214, 180, 124, 0.3)' }}
+                  disabled={!!user.dob}
+                >
+                  <option value="06:00">ตัดเวลา 06:00 น. (มาตรฐาน)</option>
+                  <option value="sunrise">ตัดเวลาตามดวงอาทิตย์ขึ้นจริง (อาทิตย์อุทัยของจังหวัด)</option>
+                </select>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginTop: '0.5rem', lineHeight: 1.4 }}>
+                  *ตำราส่วนใหญ่ใช้ตัดเวลา 06:00 น. แต่หากเกิดช่วงคาบเกี่ยวเช้ามืด สามารถเลือกตัดตามพระอาทิตย์ขึ้นจริงของจังหวัดได้ค่ะ
+                </p>
               </div>
               <div>
                 <label style={{ color: 'var(--text-muted)', fontSize: '0.85rem', display: 'block', marginBottom: '0.3rem' }}>เบอร์โทรศัพท์</label>
