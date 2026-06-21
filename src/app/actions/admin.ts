@@ -77,11 +77,11 @@ export async function getAdminOrders() {
         serviceStage: serviceStage,
         prediction: prediction,
         customerInfo: {
-          name: order.user?.name,
+          name: order.user?.name || null,
           ...customerInfo
         },
         questions: order.questions || [],
-        cards: formattedCards
+        cards: formattedCards || []
       };
     });
   } catch (error) {
