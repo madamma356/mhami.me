@@ -569,44 +569,44 @@ export default function AdminDashboard() {
                 <table style={{ width: '100%', borderCollapse: 'collapse', color: 'var(--text-main)', textAlign: 'left' }}>
                   <thead>
                     <tr style={{ borderBottom: '1px solid rgba(214, 180, 124, 0.2)', background: 'rgba(0,0,0,0.2)' }}>
-                      <th style={{ padding: '1.5rem', color: 'var(--primary)', fontWeight: 400 }}>รหัสลูกค้า</th>
-                      <th style={{ padding: '1.5rem', color: 'var(--primary)', fontWeight: 400 }}>ชื่อ-นามสกุล / ชื่อเล่น</th>
-                      <th style={{ padding: '1.5rem', color: 'var(--primary)', fontWeight: 400 }}>ช่องทางติดต่อ</th>
-                      <th style={{ padding: '1.5rem', color: 'var(--primary)', fontWeight: 400 }}>วันเกิด / เวลาเกิด</th>
-                      <th style={{ padding: '1.5rem', color: 'var(--primary)', fontWeight: 400 }}>จังหวัด</th>
-                      <th style={{ padding: '1.5rem', color: 'var(--primary)', fontWeight: 400 }}>สถานะ</th>
-                      <th style={{ padding: '1.5rem', color: 'var(--primary)', fontWeight: 400 }}>ลัคนาราศี</th>
+                      <th style={{ padding: '1rem', color: 'var(--primary)', fontWeight: 400, fontSize: '0.9rem' }}>รหัสลูกค้า</th>
+                      <th style={{ padding: '1rem', color: 'var(--primary)', fontWeight: 400, fontSize: '0.9rem', minWidth: '180px' }}>ชื่อ-นามสกุล / ชื่อเล่น</th>
+                      <th style={{ padding: '1rem', color: 'var(--primary)', fontWeight: 400, fontSize: '0.9rem' }}>ช่องทางติดต่อ</th>
+                      <th style={{ padding: '1rem', color: 'var(--primary)', fontWeight: 400, fontSize: '0.9rem', minWidth: '120px' }}>วันเกิด / เวลาเกิด</th>
+                      <th style={{ padding: '1rem', color: 'var(--primary)', fontWeight: 400, fontSize: '0.9rem' }}>จังหวัด</th>
+                      <th style={{ padding: '1rem', color: 'var(--primary)', fontWeight: 400, fontSize: '0.9rem' }}>สถานะ</th>
+                      <th style={{ padding: '1rem', color: 'var(--primary)', fontWeight: 400, fontSize: '0.9rem' }}>ลัคนาราศี</th>
                     </tr>
                   </thead>
                   <tbody>
                     {customersList.map((c, i) => (
                       <tr key={i} style={{ borderBottom: '1px solid rgba(214, 180, 124, 0.1)' }}>
-                        <td style={{ padding: '1.5rem', fontSize: '0.9rem', color: 'var(--text-muted)' }}>{c.id.substring(0, 8)}...</td>
-                        <td style={{ padding: '1.5rem' }}>
-                          <span style={{ color: 'var(--text-main)', display: 'block' }}>{c.name}</span>
-                          {c.nickname && <span style={{ color: 'var(--primary)', fontSize: '0.85rem' }}>({c.nickname})</span>}
+                        <td style={{ padding: '1rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>{c.id.substring(0, 8)}...</td>
+                        <td style={{ padding: '1rem' }}>
+                          <span style={{ color: 'var(--text-main)', display: 'block', fontSize: '0.95rem' }}>{c.name}</span>
+                          {c.nickname && <span style={{ color: 'var(--primary)', fontSize: '0.8rem' }}>({c.nickname})</span>}
                         </td>
-                        <td style={{ padding: '1.5rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                        <td style={{ padding: '1rem', color: 'var(--text-muted)', fontSize: '0.85rem', whiteSpace: 'nowrap' }}>
                           <div style={{ marginBottom: '0.2rem' }}><i className="fas fa-phone" style={{ width: '20px' }}></i> {c.contact}</div>
                           <div><i className="fab fa-line" style={{ color: '#00B900', width: '20px' }}></i> {c.lineId}</div>
                         </td>
-                        <td style={{ padding: '1.5rem', color: 'var(--text-main)' }}>
+                        <td style={{ padding: '1rem', color: 'var(--text-main)', fontSize: '0.85rem', whiteSpace: 'nowrap' }}>
                           <div style={{ marginBottom: '0.2rem' }}>{c.dob}</div>
-                          <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}><i className="far fa-clock"></i> {c.birthTime} น.</div>
+                          <div style={{ color: 'var(--text-muted)' }}><i className="far fa-clock"></i> {c.birthTime} น.</div>
                         </td>
-                        <td style={{ padding: '1.5rem', color: 'var(--text-main)' }}>{c.province}</td>
-                        <td style={{ padding: '1.5rem' }}>
-                          <span style={{ padding: '0.4rem 1rem', borderRadius: '2rem', fontSize: '0.8rem', backgroundColor: `${c.statusColor}20`, color: c.statusColor, border: `1px solid ${c.statusColor}40` }}>{c.status} ({c.orders} ออเดอร์)</span>
+                        <td style={{ padding: '1rem', color: 'var(--text-main)', fontSize: '0.9rem' }}>{c.province}</td>
+                        <td style={{ padding: '1rem', whiteSpace: 'nowrap' }}>
+                          <span style={{ padding: '0.4rem 0.8rem', borderRadius: '2rem', fontSize: '0.75rem', backgroundColor: `${c.statusColor}20`, color: c.statusColor, border: `1px solid ${c.statusColor}40` }}>{c.status} ({c.orders})</span>
                         </td>
-                        <td style={{ padding: '1.5rem' }}>
+                        <td style={{ padding: '1rem' }}>
                           <select 
                             value={c.ascendant || ''}
                             onChange={(e) => handleUpdateAscendant(c.id, e.target.value)}
                             style={{ 
                               backgroundColor: 'rgba(0,0,0,0.4)', color: 'var(--text-main)', 
-                              border: '1px solid rgba(214, 180, 124, 0.3)', padding: '0.5rem', 
+                              border: '1px solid rgba(214, 180, 124, 0.3)', padding: '0.4rem', 
                               borderRadius: '0.5rem', outline: 'none', cursor: 'pointer',
-                              fontFamily: 'inherit', fontSize: '0.9rem', width: '150px'
+                              fontFamily: 'inherit', fontSize: '0.85rem', width: '130px'
                             }}
                           >
                             <option value="">-- ยังไม่คำนวณ --</option>
