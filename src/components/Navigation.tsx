@@ -13,11 +13,6 @@ export default function Navigation() {
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Hide global navigation on admin pages
-  if (pathname?.startsWith('/admin')) {
-    return null;
-  }
-
   // Handle scroll effect
   useEffect(() => {
     const handleScroll = () => {
@@ -26,6 +21,11 @@ export default function Navigation() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Hide global navigation on admin pages
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
 
   const navLinks = [
     { name: 'หน้าแรก', path: '/' },
