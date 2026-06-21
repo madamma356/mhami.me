@@ -1,1 +1,0 @@
-self.__REACT_LOADABLE_MANIFEST='{"app/reading/[id]/page.tsx -> @/components/PDFReader":{"id":7888,"files":["static/chunks/888.1946ee6457c4dfab.js"]}}';
