@@ -73,6 +73,7 @@ export async function getAdminOrders() {
         price: `${order.pricePaid}.-`,
         slipUrl: order.slipUrl || 'https://images.unsplash.com/photo-1620714223084-8fcacc6dfd8d?q=80&w=600&auto=format&fit=crop',
         slipStatus: order.slipStatus === 'passed' ? 'approved' : 
+                    order.slipStatus === 'failed' ? 'rejected' :
                     order.slipStatus === 'unchecked' ? 'pending' : order.slipStatus,
         serviceStage: serviceStage,
         prediction: prediction,
