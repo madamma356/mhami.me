@@ -41,8 +41,10 @@ export default function LifeUnveiledPage() {
   }
 
   const handleNext = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
     setStep(s => s + 1);
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 100);
   };
 
   const StepIndicator = () => (
