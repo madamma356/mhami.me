@@ -20,16 +20,16 @@ export default function LifeUnveiledPage() {
   const [story, setStory] = useState('');
   const [extraNote, setExtraNote] = useState('');
 
-  const { status } = useSession();
+  const { status: authStatus } = useSession();
   const router = useRouter();
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    if (authStatus === 'unauthenticated') {
       router.push('/member/login?callbackUrl=/consultation/life-unveiled');
     }
-  }, [status, router]);
+  }, [authStatus, router]);
 
-  if (status === 'loading' || status === 'unauthenticated') {
+  if (authStatus === 'loading' || authStatus === 'unauthenticated') {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: 'var(--bg-dark)' }}>
         <div style={{ textAlign: 'center' }}>
