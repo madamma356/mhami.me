@@ -60,9 +60,15 @@ export default function AdminDashboard() {
     fetchOrders();
 
     const fetchCustomers = async () => {
-      const dbCustomers = await getAllCustomers();
-      if (dbCustomers && dbCustomers.length > 0) {
-        setCustomersList(dbCustomers);
+      try {
+        const dbCustomers = await getAllCustomers();
+        if (dbCustomers) {
+          setCustomersList(dbCustomers);
+        } else {
+          setCustomersList([]);
+        }
+      } catch (err) {
+        setCustomersList([]);
       }
     };
     fetchCustomers();

@@ -182,17 +182,17 @@ export async function getAllCustomers() {
       } catch (e) {}
 
       // Identify VIP based on orders count
-      const ordersCount = user.orders.length;
+      const ordersCount = user.orders?.length || 0;
       const status = ordersCount > 3 ? 'VIP' : 'Active';
       const statusColor = ordersCount > 3 ? 'var(--primary)' : '#33d9b2';
 
       return {
-        id: user.id,
+        id: user.id || 'unknown',
         name: user.name || 'คุณลูกค้า',
         nickname: profileData.nickname || '',
-        contact: profileData.phone || user.email,
+        contact: profileData.phone || user.email || '-',
         lineId: profileData.lineId || '-',
-        date: user.createdAt.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' }),
+        date: user.createdAt ? user.createdAt.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' }) : '-',
         orders: ordersCount,
         status: status,
         statusColor: statusColor,
@@ -202,9 +202,23 @@ export async function getAllCustomers() {
         ascendant: profileData.ascendant || ''
       };
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching all customers:", error);
-    return [];
+    return [{
+      id: 'ERR',
+      name: 'Error: ' + (error?.message || 'Unknown error'),
+      nickname: '',
+      contact: '-',
+      lineId: '-',
+      date: '-',
+      orders: 0,
+      status: 'Error',
+      statusColor: '#ff0000',
+      dob: '-',
+      birthTime: '-',
+      province: '-',
+      ascendant: ''
+    }];
   }
 }
 
