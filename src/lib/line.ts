@@ -2,15 +2,20 @@ import { Client } from "@line/bot-sdk";
 
 const config = {
   channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN || "",
-  channelSecret: process.env.LINE_CHANNEL_SECRET || "", // This is the Messaging API secret, usually different from Login secret, but not strictly needed just to send push messages if token is provided.
+  channelSecret: process.env.LINE_CHANNEL_SECRET || "", 
 };
 
-const client = new Client(config);
+// Lazy initialization to prevent build crash when env vars are missing
+let client: Client | null = null;
 
 export const sendLinePushNotification = async (userId: string, messages: any[]) => {
   if (!config.channelAccessToken) {
     console.warn("LINE_CHANNEL_ACCESS_TOKEN is missing. Skipping push notification.");
     return false;
+  }
+
+  if (!client) {
+    client = new Client(config);
   }
 
   try {
