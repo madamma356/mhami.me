@@ -82,14 +82,15 @@ export default function CardPicker({ maxCards, onComplete, title, subtitle }: Ca
         }
         @media (max-width: 768px) {
           .card-picker-container {
-            padding: 1rem;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
           }
           .card-picker-inner {
-            padding: 0.5rem;
+            padding: 0.25rem;
           }
           .card-grid {
-            grid-template-columns: repeat(10, 1fr);
-            gap: 0.2rem;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 0.15rem;
           }
         }
         @keyframes mysticShuffleLeft {
