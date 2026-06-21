@@ -3,8 +3,8 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { getMemberData, updateMemberProfile } from '@/app/actions/member';
-import { useEffect } from 'react';
+import { getMemberData, updateMemberProfile, reuploadSlip } from '@/app/actions/member';
+import { useEffect, useRef } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 
 export default function MemberDashboard() {
@@ -30,8 +30,31 @@ export default function MemberDashboard() {
   const handleSaveProfile = async () => {
     setUser({ ...editForm });
     setIsEditing(false);
-    // API call to Supabase/backend
     await updateMemberProfile(editForm);
+  };
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploadingSlip, setIsUploadingSlip] = useState(false);
+
+  const handleReuploadSlip = async (orderId: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingSlip(true);
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64 = reader.result as string;
+      const res = await reuploadSlip(orderId, base64);
+      if (res.success) {
+        alert("อัปโหลดสลิปใหม่สำเร็จแล้ว หม่ามี๊จะรีบตรวจสอบให้นะคะ!");
+        // Refresh page to show updated status
+        window.location.reload();
+      } else {
+        alert("อัปโหลดไม่สำเร็จ กรุณาลองใหม่อีกครั้งค่ะ");
+      }
+      setIsUploadingSlip(false);
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleLogout = async () => {
@@ -121,17 +144,49 @@ export default function MemberDashboard() {
             {activeOrders.length > 0 ? (
               <div style={{ display: 'grid', gap: '1rem' }}>
                 {activeOrders.map(order => (
-                  <div key={order.id} className="healing-card" style={{ padding: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                      <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.5rem' }}>ออเดอร์ {order.id} • {order.date}</span>
-                      <h4 style={{ color: 'var(--primary)', fontSize: '1.2rem', margin: '0 0 0.5rem 0' }}>{order.service}</h4>
+                  <div key={order.id} className="healing-card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div>
+                        <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.5rem' }}>ออเดอร์ {order.id} • {order.date}</span>
+                        <h4 style={{ color: 'var(--primary)', fontSize: '1.2rem', margin: '0 0 0.5rem 0' }}>{order.service}</h4>
+                      </div>
+                      <div style={{ textAlign: 'right' }}>
+                        <span style={{ display: 'inline-block', backgroundColor: 'rgba(214, 180, 124, 0.1)', color: 'var(--accent-bokeh)', padding: '0.5rem 1rem', borderRadius: '2rem', fontSize: '0.9rem', border: '1px solid rgba(255, 215, 0, 0.3)' }}>
+                          <i className="fas fa-spinner fa-spin" style={{ marginRight: '0.5rem' }}></i>
+                          {order.status}
+                        </span>
+                      </div>
                     </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <span style={{ display: 'inline-block', backgroundColor: 'rgba(214, 180, 124, 0.1)', color: 'var(--accent-bokeh)', padding: '0.5rem 1rem', borderRadius: '2rem', fontSize: '0.9rem', border: '1px solid rgba(255, 215, 0, 0.3)' }}>
-                        <i className="fas fa-spinner fa-spin" style={{ marginRight: '0.5rem' }}></i>
-                        {order.status}
-                      </span>
-                    </div>
+
+                    {/* Alert for Rejected Slip */}
+                    {order.slipStatus === 'rejected' && (
+                      <div style={{ backgroundColor: 'rgba(255, 107, 107, 0.1)', border: '1px solid #ff6b6b', borderRadius: '0.5rem', padding: '1rem', marginTop: '0.5rem' }}>
+                        <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+                          <i className="fas fa-exclamation-triangle" style={{ color: '#ff6b6b', marginTop: '0.2rem' }}></i>
+                          <div>
+                            <h5 style={{ color: '#ff6b6b', margin: '0 0 0.5rem 0', fontSize: '1rem' }}>สลิปโอนเงินไม่ถูกต้อง</h5>
+                            <p style={{ color: 'var(--text-main)', fontSize: '0.85rem', margin: '0 0 1rem 0', lineHeight: '1.4' }}>
+                              หม่ามี๊ตรวจสอบสลิปแล้วพบว่าข้อมูลไม่ถูกต้องค่ะ รบกวนลูกอัปโหลดสลิปใหม่เพื่อยืนยันคิวนะคะ
+                            </p>
+                            <input 
+                              type="file" 
+                              accept="image/*" 
+                              style={{ display: 'none' }} 
+                              ref={fileInputRef}
+                              onChange={(e) => handleReuploadSlip(order.id, e)}
+                            />
+                            <button 
+                              onClick={() => fileInputRef.current?.click()}
+                              disabled={isUploadingSlip}
+                              className="cozy-button filled" 
+                              style={{ padding: '0.5rem 1rem', fontSize: '0.85rem', backgroundColor: '#ff6b6b', color: '#fff' }}
+                            >
+                              {isUploadingSlip ? 'กำลังอัปโหลด...' : 'อัปโหลดสลิปใหม่'}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

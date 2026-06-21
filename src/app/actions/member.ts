@@ -109,7 +109,9 @@ export async function getMemberData() {
         status: serviceStage,
         date: order.createdAt.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' }),
         type: order.type === 'THREE_QUESTIONS' ? '3 Questions' : 
-              order.type === 'PHROM_YAN' ? '12 Cards' : 'Blueprint'
+              order.type === 'PHROM_YAN' ? '12 Cards' : 'Blueprint',
+        slipStatus: order.slipStatus,
+        slipUrl: order.slipUrl
       };
     });
 
@@ -182,5 +184,38 @@ export async function updateMemberProfile(data: any) {
   } catch (error) {
     console.error("Error updating profile:", error);
     return { success: false, error };
+  }
+}
+
+export async function reuploadSlip(orderNumber: string, slipBase64: string) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email) return { success: false, error: "Not logged in" };
+
+    const user = await prisma.user.findUnique({ where: { email: session.user.email } });
+    if (!user) return { success: false, error: "User not found" };
+
+    const order = await prisma.order.findUnique({ where: { orderNumber } });
+    if (!order || order.userId !== user.id) return { success: false, error: "Order not found" };
+
+    // Upload new slip
+    const { uploadToCloudinary } = await import('./checkout');
+    const slipUrl = await uploadToCloudinary(slipBase64, 'slips');
+    
+    if (!slipUrl) return { success: false, error: "Failed to upload slip image" };
+
+    await prisma.order.update({
+      where: { id: order.id },
+      data: {
+        slipUrl,
+        slipStatus: 'unchecked',
+        status: 'PENDING'
+      }
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to reupload slip:", error);
+    return { success: false, error: "Failed to reupload slip" };
   }
 }

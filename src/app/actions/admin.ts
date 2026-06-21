@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { uploadToCloudinary } from "./checkout";
+import { sendLinePushNotification } from '@/lib/line';
 
 export async function getAdminOrders() {
   try {
@@ -126,13 +127,39 @@ export async function updateOrderStatus(dbId: string, slipStatus: string, servic
     if (serviceStage === 'กำลังเชื่อมต่อพลังงาน') newStatus = 'PROCESSING';
     if (serviceStage === 'พร้อมส่งมอบความสบายใจ') newStatus = 'COMPLETED';
 
-    await prisma.order.update({
+    const order = await prisma.order.update({
       where: { id: dbId },
       data: {
         slipStatus,
         status: newStatus
       }
     });
+
+    if (slipStatus === 'rejected') {
+      try {
+        const account = await prisma.account.findFirst({
+          where: { userId: order.userId, provider: 'line' }
+        });
+        
+        if (account && account.providerAccountId) {
+          const reuploadUrl = `${process.env.NEXTAUTH_URL || 'https://mhami.me'}/member`;
+          const messages = [
+            {
+              type: "text",
+              text: `คุณหม่ามี๊ตรวจสอบสลิปโอนเงินสำหรับออเดอร์ ${order.orderNumber} แล้วพบว่าไม่ถูกต้องค่ะ 🥺\n\nรบกวนลูกอัปโหลดสลิปใหม่ผ่านลิงก์ด้านล่างนี้นะคะ👇`
+            },
+            {
+              type: "text",
+              text: reuploadUrl
+            }
+          ];
+          await sendLinePushNotification(account.providerAccountId, messages);
+        }
+      } catch (err) {
+        console.error("Failed to send slip rejection notification:", err);
+      }
+    }
+
     return { success: true };
   } catch (error) {
     console.error("Error updating status:", error);
