@@ -142,6 +142,10 @@ export async function updateOrderStatus(dbId: string, slipStatus: string, servic
     if (slipStatus === 'rejected') dbSlipStatus = 'failed';
     if (slipStatus === 'pending') dbSlipStatus = 'unchecked';
 
+    // Fetch current order to check what actually changed
+    const currentOrder = await prisma.order.findUnique({ where: { id: dbId } });
+    if (!currentOrder) return { success: false, error: "Order not found" };
+
     const order = await prisma.order.update({
       where: { id: dbId },
       data: {
@@ -166,9 +170,14 @@ export async function updateOrderStatus(dbId: string, slipStatus: string, servic
       }
     }
 
-    if (slipStatus === 'rejected') {
-      try {
-        if (providerAccountId) {
+    // Check if slipStatus changed
+    const slipChanged = currentOrder.slipStatus !== dbSlipStatus;
+    // Check if service status changed
+    const statusChanged = currentOrder.status !== newStatus;
+
+    if (providerAccountId) {
+      if (slipChanged && dbSlipStatus === 'failed') {
+        try {
           const reuploadUrl = `${process.env.NEXTAUTH_URL || 'https://mhami.me'}/member`;
           const messages = [
             {
@@ -181,13 +190,11 @@ export async function updateOrderStatus(dbId: string, slipStatus: string, servic
             }
           ];
           await sendLinePushNotification(providerAccountId, messages);
+        } catch (err) {
+          console.error("Failed to send slip rejection notification:", err);
         }
-      } catch (err) {
-        console.error("Failed to send slip rejection notification:", err);
-      }
-    } else if (slipStatus === 'approved') {
-      try {
-        if (providerAccountId) {
+      } else if (slipChanged && dbSlipStatus === 'passed') {
+        try {
           const messages = [
             {
               type: "text",
@@ -195,9 +202,40 @@ export async function updateOrderStatus(dbId: string, slipStatus: string, servic
             }
           ];
           await sendLinePushNotification(providerAccountId, messages);
+        } catch (err) {
+          console.error("Failed to send slip approval notification:", err);
         }
-      } catch (err) {
-        console.error("Failed to send slip approval notification:", err);
+      }
+
+      if (statusChanged && newStatus === 'PROCESSING') {
+        try {
+          const messages = [
+            {
+              type: "text",
+              text: `🔮 หม่ามี๊กำลังเริ่มเชื่อมต่อพลังงานเพื่อเปิดไพ่ให้สำหรับออเดอร์ ${order.orderNumber} แล้วนะคะ\n\nทำใจให้สบายๆ น้า แล้วรอรับคำทำนายได้เลยค่ะ ✨`
+            }
+          ];
+          await sendLinePushNotification(providerAccountId, messages);
+        } catch (err) {
+          console.error("Failed to send processing notification:", err);
+        }
+      } else if (statusChanged && newStatus === 'COMPLETED') {
+        try {
+          const readingUrl = `${process.env.NEXTAUTH_URL || 'https://mhami.me'}/reading/${order.orderNumber.replace('#', '')}`;
+          const messages = [
+            {
+              type: "text",
+              text: `✨ คำทำนายของคุณลูก (ออเดอร์ ${order.orderNumber}) พร้อมส่งมอบความสบายใจแล้วค่ะ!\n\nคุณลูกสามารถเข้าไปดูรูปไพ่และอ่านผลคำทำนายแบบเต็มๆ ได้ที่ลิงก์ด้านล่างนี้เลยนะคะ 👇`
+            },
+            {
+              type: "text",
+              text: readingUrl
+            }
+          ];
+          await sendLinePushNotification(providerAccountId, messages);
+        } catch (err) {
+          console.error("Failed to send completed notification:", err);
+        }
       }
     }
 
