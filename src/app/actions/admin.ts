@@ -212,7 +212,7 @@ export async function updateOrderStatus(dbId: string, slipStatus: string, servic
           const messages = [
             {
               type: "text",
-              text: `🔮 หม่ามี๊กำลังเริ่มเชื่อมต่อพลังงานเพื่อเปิดไพ่ให้สำหรับออเดอร์ ${order.orderNumber} แล้วนะคะ\n\nทำใจให้สบายๆ น้า แล้วรอรับคำทำนายได้เลยค่ะ ✨`
+              text: `🔮 หม่ามี๊กำลังเชื่อมต่อพลังงานสำหรับ คำถาม ${order.orderNumber} แล้วนะคะ\n\nใช้เวลาไม่เกิน 24 ชม. หากคำทำนายเรียบร้อย หนูลูกรอรับข้อความแจ้งเตือนได้เลยค่ะ ✨`
             }
           ];
           await sendLinePushNotification(providerAccountId, messages);
@@ -225,7 +225,7 @@ export async function updateOrderStatus(dbId: string, slipStatus: string, servic
           const messages = [
             {
               type: "text",
-              text: `✨ คำทำนายของคุณลูก (ออเดอร์ ${order.orderNumber}) พร้อมส่งมอบความสบายใจแล้วค่ะ!\n\nคุณลูกสามารถเข้าไปดูรูปไพ่และอ่านผลคำทำนายแบบเต็มๆ ได้ที่ลิงก์ด้านล่างนี้เลยนะคะ 👇`
+              text: `✨ สำหรับคำถาม ${order.orderNumber} หม่ามี๊พร้อมส่งมอบความสบายใจแล้วค่ะ!\n\nหนูลูกสามารถเข้าไปอ่านคำทำนายฮีลใจฉบับเต็มๆ ได้ที่ลิงก์ด้านล่างนี้เลยนะคะ 👇`
             },
             {
               type: "text",
