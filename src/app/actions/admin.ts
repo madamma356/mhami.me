@@ -8,7 +8,7 @@ export async function getAdminOrders() {
   try {
     const orders = await prisma.order.findMany({
       include: { 
-        user: true, 
+        user: { include: { accounts: true } }, 
         readings: true 
       },
       orderBy: { createdAt: 'desc' }
@@ -68,7 +68,7 @@ export async function getAdminOrders() {
         dbId: order.id,
         date: order.createdAt.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' }),
         name: order.user?.name || 'ลูกค้า',
-        lineId: order.contactInfo || '-',
+        lineId: (order.user as any)?.accounts?.find((a: any) => a.provider === 'line')?.providerAccountId || order.contactInfo || '-',
         service: serviceName,
         price: `${order.pricePaid}.-`,
         slipUrl: order.slipUrl || 'https://images.unsplash.com/photo-1620714223084-8fcacc6dfd8d?q=80&w=600&auto=format&fit=crop',
@@ -164,6 +164,24 @@ export async function updateOrderStatus(dbId: string, slipStatus: string, servic
         }
       } catch (err) {
         console.error("Failed to send slip rejection notification:", err);
+      }
+    } else if (slipStatus === 'approved') {
+      try {
+        const account = await prisma.account.findFirst({
+          where: { userId: order.userId, provider: 'line' }
+        });
+        
+        if (account && account.providerAccountId) {
+          const messages = [
+            {
+              type: "text",
+              text: `ยอดเงินของคุณลูก (ออเดอร์ ${order.orderNumber}) ได้รับการตรวจสอบและอนุมัติเรียบร้อยแล้วค่ะ ✨\n\nโปรดรอรับคำทำนายจากหม่ามี๊ได้เลยนะคะ 🙏`
+            }
+          ];
+          await sendLinePushNotification(account.providerAccountId, messages);
+        }
+      } catch (err) {
+        console.error("Failed to send slip approval notification:", err);
       }
     }
 
