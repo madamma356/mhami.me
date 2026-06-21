@@ -244,10 +244,15 @@ export default function AdminDashboard() {
     // Check NextAuth session first
     if (session?.user && (session.user as any).role === 'ADMIN') {
       isAuthed = true;
-    } 
-    // Fallback to old localStorage method
-    else if (typeof window !== 'undefined' && localStorage.getItem('mhami_is_admin') === 'true') {
-      isAuthed = true;
+    } else {
+      // Fallback to old localStorage method
+      try {
+        if (typeof window !== 'undefined' && localStorage.getItem('mhami_is_admin') === 'true') {
+          isAuthed = true;
+        }
+      } catch (e) {
+        console.warn('localStorage access error', e);
+      }
     }
 
     if (isAuthed) {

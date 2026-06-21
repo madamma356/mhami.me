@@ -11,9 +11,13 @@ export default function AdminLogin() {
   // If already logged in, redirect to admin
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const isAdmin = localStorage.getItem('mhami_is_admin');
-      if (isAdmin === 'true') {
-        router.push('/admin');
+      try {
+        const isAdmin = localStorage.getItem('mhami_is_admin');
+        if (isAdmin === 'true') {
+          router.push('/admin');
+        }
+      } catch (e) {
+        console.warn('localStorage read error', e);
       }
     }
   }, [router]);
@@ -23,7 +27,11 @@ export default function AdminLogin() {
     
     // Simulate API request delay for LINE authentication
     setTimeout(() => {
-      localStorage.setItem('mhami_is_admin', 'true');
+      try {
+        localStorage.setItem('mhami_is_admin', 'true');
+      } catch (e) {
+        console.warn('localStorage write error', e);
+      }
       router.push('/admin');
       window.dispatchEvent(new Event('auth-change'));
     }, 1500);
