@@ -10,10 +10,11 @@ function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const error = searchParams.get('error');
+  const callbackUrl = searchParams.get('callbackUrl') || '/member';
 
   const handleLineLogin = (e: React.MouseEvent) => {
     e.preventDefault();
-    signIn('line', { callbackUrl: '/member' });
+    signIn('line', { callbackUrl });
   };
 
   return (

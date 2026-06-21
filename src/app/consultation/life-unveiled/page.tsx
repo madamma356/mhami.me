@@ -1,7 +1,9 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import CardPicker from '@/components/CardPicker';
 import CheckoutStep from '@/components/CheckoutStep';
 import { createOrder } from '@/app/actions/checkout';
@@ -17,6 +19,26 @@ export default function LifeUnveiledPage() {
   const [status, setStatus] = useState('');
   const [story, setStory] = useState('');
   const [extraNote, setExtraNote] = useState('');
+
+  const { status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/member/login?callbackUrl=/consultation/life-unveiled');
+    }
+  }, [status, router]);
+
+  if (status === 'loading' || status === 'unauthenticated') {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: 'var(--bg-dark)' }}>
+        <div style={{ textAlign: 'center' }}>
+          <i className="fas fa-spinner fa-spin" style={{ color: 'var(--primary)', fontSize: '3rem', marginBottom: '1rem' }}></i>
+          <p style={{ color: 'var(--primary)' }}>กำลังตรวจสอบสถานะการเข้าสู่ระบบ...</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleNext = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
