@@ -184,9 +184,9 @@ function calculateThaiAscendant(dobStr: string, timeStr: string): string {
   let sunSign = Math.floor(sunLongitude / 30);
   let sunDegree = sunLongitude % 30;
 
-  // Rising times for Bangkok (อันโตนาที) in minutes - sum is 1440
+  // Rising times for Bangkok (อันโตนาทีสามัญตามคัมภีร์สุริยยาตร์) in minutes - sum is 1440
   // เมษ, พฤษภ, เมถุน, กรกฎ, สิงห์, กันย์, ตุลย์, พิจิก, ธนู, มังกร, กุมภ์, มีน
-  const risingTimes = [105, 115, 130, 138, 138, 130, 115, 105, 104, 109, 120, 131];
+  const risingTimes = [104.4, 109.9, 120.9, 131.9, 131.9, 120.9, 104.4, 109.9, 120.9, 131.9, 131.9, 120.9];
 
   let remainingMinutes = birthMinutesFrom6AM;
   let currentSign = sunSign;
