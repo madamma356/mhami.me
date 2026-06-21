@@ -138,7 +138,7 @@ export async function getMemberData() {
   }
 }
 
-function calculateThaiAscendant(dobStr: string, timeStr: string, province: string = '', cutoffType: string = '06:00'): string {
+function calculateThaiAscendant(dobStr: string, timeStr: string): string {
   if (!dobStr || !timeStr) return '';
   
   const dateParts = dobStr.split('-');
@@ -153,43 +153,7 @@ function calculateThaiAscendant(dobStr: string, timeStr: string, province: strin
   let hours = parseInt(timeParts[0]);
   let minutes = parseInt(timeParts[1]);
 
-  // LMT and Sunrise calculation
-  let localCorrectionMinutes = 0;
-  if (cutoffType === 'sunrise' && province) {
-    const provinceLongitudes: Record<string, number> = {
-      "กรุงเทพมหานคร": 100.5, "กทม": 100.5, "สมุทรปราการ": 100.6, "นนทบุรี": 100.5, "ปทุมธานี": 100.5,
-      "อยุธยา": 100.5, "อ่างทอง": 100.4, "ลพบุรี": 100.6, "สิงห์บุรี": 100.4, "ชัยนาท": 100.1,
-      "สระบุรี": 100.9, "ชลบุรี": 100.9, "ระยอง": 101.2, "จันทบุรี": 102.1, "ตราด": 102.5,
-      "ฉะเชิงเทรา": 101.0, "ปราจีนบุรี": 101.3, "นครนายก": 101.2, "สระแก้ว": 102.0,
-      "นครราชสีมา": 102.1, "บุรีรัมย์": 103.1, "สุรินทร์": 103.7, "ศรีสะเกษ": 104.3, "อุบลราชธานี": 104.8,
-      "ยโสธร": 104.1, "ชัยภูมิ": 102.0, "อำนาจเจริญ": 104.6, "หนองบัวลำภู": 102.4, "ขอนแก่น": 102.8,
-      "อุดรธานี": 102.7, "เลย": 101.7, "หนองคาย": 102.7, "มหาสารคาม": 103.3, "ร้อยเอ็ด": 103.6,
-      "กาฬสินธุ์": 103.5, "สกลนคร": 104.1, "นครพนม": 104.7, "มุกดาหาร": 104.7,
-      "เชียงใหม่": 98.9, "ลำพูน": 99.0, "ลำปาง": 99.5, "อุตรดิตถ์": 100.0, "แพร่": 100.1,
-      "น่าน": 100.7, "พะเยา": 99.9, "เชียงราย": 99.8, "แม่ฮ่องสอน": 97.9,
-      "นครสวรรค์": 100.1, "อุทัยธานี": 100.0, "กำแพงเพชร": 99.5, "ตาก": 99.1, "สุโขทัย": 99.8,
-      "พิษณุโลก": 100.2, "พิจิตร": 100.3, "เพชรบูรณ์": 101.1,
-      "ราชบุรี": 99.8, "กาญจนบุรี": 99.5, "สุพรรณบุรี": 100.1, "นครปฐม": 100.0, "สมุทรสาคร": 100.2,
-      "สมุทรสงคราม": 100.0, "เพชรบุรี": 99.9, "ประจวบคีรีขันธ์": 99.8,
-      "นครศรีธรรมราช": 99.9, "กระบี่": 98.9, "พังงา": 98.5, "ภูเก็ต": 98.3, "สุราษฎร์ธานี": 99.3,
-      "ระนอง": 98.6, "ชุมพร": 99.1, "สงขลา": 100.5, "สตูล": 100.0, "ตรัง": 99.6,
-      "พัทลุง": 100.0, "ปัตตานี": 101.2, "ยะลา": 101.2, "นราธิวาส": 101.8
-    };
-    
-    // Find longitude, default to BKK if not found
-    let lon = 100.5;
-    for (const [key, val] of Object.entries(provinceLongitudes)) {
-      if (province.includes(key)) {
-        lon = val;
-        break;
-      }
-    }
-    
-    // 105 degrees is the standard meridian for Thailand time
-    localCorrectionMinutes = (lon - 105) * 4;
-  }
-
-  // Astrological day starts at 06:00 AM standard, but we apply correction if requested
+  // Astrological day starts at 06:00 AM standard
   const cutoffTime = 6;
   if (hours < cutoffTime) {
     hours += 24;
@@ -202,8 +166,7 @@ function calculateThaiAscendant(dobStr: string, timeStr: string, province: strin
   }
 
   // Calculate total minutes elapsed since 06:00 AM of the astrological day
-  // Plus any local sunrise correction
-  const birthMinutesFrom6AM = ((hours - 6) * 60) + minutes + localCorrectionMinutes;
+  const birthMinutesFrom6AM = ((hours - 6) * 60) + minutes;
 
   // Day of year calculation
   const startOfYear = new Date(year, 0, 0);
@@ -293,12 +256,11 @@ export async function updateMemberProfile(data: any) {
     const dob = currentProfile.dob ? currentProfile.dob : data.dob;
     const birthTime = currentProfile.birthTime ? currentProfile.birthTime : data.birthTime;
     const province = currentProfile.province ? currentProfile.province : data.province;
-    const cutoffType = data.cutoffType || '06:00';
 
     // Calculate ascendant if not already calculated
     let ascendant = currentProfile.ascendant;
     if (!ascendant && dob && birthTime) {
-      ascendant = calculateThaiAscendant(dob, birthTime, province, cutoffType);
+      ascendant = calculateThaiAscendant(dob, birthTime);
     }
 
     await prisma.user.update({
@@ -311,8 +273,7 @@ export async function updateMemberProfile(data: any) {
           birthTime: birthTime || '',
           province: province || '',
           phone: data.phone || '',
-          ascendant: ascendant || '',
-          cutoffType: cutoffType
+          ascendant: ascendant || ''
         })
       }
     });
