@@ -144,36 +144,66 @@ function calculateThaiAscendant(dobStr: string, timeStr: string): string {
   const dateParts = dobStr.split('-');
   if (dateParts.length !== 3) return '';
   
-  const month = parseInt(dateParts[1]);
-  const day = parseInt(dateParts[2]);
+  let year = parseInt(dateParts[0]);
+  let month = parseInt(dateParts[1]);
+  let day = parseInt(dateParts[2]);
   
-  let sunSignIndex = 0;
-  if ((month === 4 && day >= 13) || (month === 5 && day <= 14)) sunSignIndex = 0; // เมษ
-  else if ((month === 5 && day >= 15) || (month === 6 && day <= 14)) sunSignIndex = 1; // พฤษภ
-  else if ((month === 6 && day >= 15) || (month === 7 && day <= 14)) sunSignIndex = 2; // เมถุน
-  else if ((month === 7 && day >= 15) || (month === 8 && day <= 15)) sunSignIndex = 3; // กรกฎ
-  else if ((month === 8 && day >= 16) || (month === 9 && day <= 16)) sunSignIndex = 4; // สิงห์
-  else if ((month === 9 && day >= 17) || (month === 10 && day <= 16)) sunSignIndex = 5; // กันย์
-  else if ((month === 10 && day >= 17) || (month === 11 && day <= 15)) sunSignIndex = 6; // ตุลย์
-  else if ((month === 11 && day >= 16) || (month === 12 && day <= 15)) sunSignIndex = 7; // พิจิก
-  else if ((month === 12 && day >= 16) || (month === 1 && day <= 13)) sunSignIndex = 8; // ธนู
-  else if ((month === 1 && day >= 14) || (month === 2 && day <= 12)) sunSignIndex = 9; // มังกร
-  else if ((month === 2 && day >= 13) || (month === 3 && day <= 13)) sunSignIndex = 10; // กุมภ์
-  else if ((month === 3 && day >= 14) || (month === 4 && day <= 12)) sunSignIndex = 11; // มีน
-
   const timeParts = timeStr.split(':');
   if (timeParts.length !== 2) return '';
-  const hours = parseInt(timeParts[0]);
-  const minutes = parseInt(timeParts[1]);
+  let hours = parseInt(timeParts[0]);
+  let minutes = parseInt(timeParts[1]);
+
+  // Astrological day starts at 06:00 AM
+  if (hours < 6) {
+    hours += 24;
+    // Subtract 1 day
+    const d = new Date(year, month - 1, day);
+    d.setDate(d.getDate() - 1);
+    year = d.getFullYear();
+    month = d.getMonth() + 1;
+    day = d.getDate();
+  }
+
+  const birthMinutesFrom6AM = ((hours - 6) * 60) + minutes;
+
+  // Day of year calculation
+  const startOfYear = new Date(year, 0, 0);
+  const diff = (new Date(year, month - 1, day).getTime() - startOfYear.getTime()) + ((startOfYear.getTimezoneOffset() - new Date(year, month - 1, day).getTimezoneOffset()) * 60 * 1000);
+  const oneDay = 1000 * 60 * 60 * 24;
+  const dayOfYear = Math.floor(diff / oneDay);
+
+  // April 13 is roughly day 103 (start of Aries in Thai Astrology)
+  let daysFromAries = dayOfYear - 103;
+  if (daysFromAries < 0) daysFromAries += 365.25;
+
+  // Sun's Longitude in degrees (0 to 360)
+  const sunLongitude = (daysFromAries * (360 / 365.25)) % 360;
   
-  const totalMinutes = hours * 60 + minutes;
-  let diffMinutes = totalMinutes - 360; // 06:00 AM
+  let sunSign = Math.floor(sunLongitude / 30);
+  let sunDegree = sunLongitude % 30;
+
+  // Rising times for Bangkok (อันโตนาที) in minutes - sum is 1440
+  // เมษ, พฤษภ, เมถุน, กรกฎ, สิงห์, กันย์, ตุลย์, พิจิก, ธนู, มังกร, กุมภ์, มีน
+  const risingTimes = [105, 115, 130, 138, 138, 130, 115, 105, 104, 109, 120, 131];
+
+  let remainingMinutes = birthMinutesFrom6AM;
+  let currentSign = sunSign;
   
-  if (diffMinutes < 0) diffMinutes += 24 * 60;
-  
-  const signsAdvanced = Math.floor(diffMinutes / 120);
-  let ascendantIndex = (sunSignIndex + signsAdvanced) % 12;
-  
+  // Subtract the remaining time of the Sun's current sign
+  const fractionRemaining = (30 - sunDegree) / 30;
+  let timeInCurrentSign = fractionRemaining * risingTimes[currentSign];
+
+  if (remainingMinutes >= timeInCurrentSign) {
+    remainingMinutes -= timeInCurrentSign;
+    currentSign = (currentSign + 1) % 12;
+
+    // Loop through the next signs
+    while (remainingMinutes >= risingTimes[currentSign]) {
+      remainingMinutes -= risingTimes[currentSign];
+      currentSign = (currentSign + 1) % 12;
+    }
+  }
+
   const zodiacNames = [
     'ลัคนาราศีเมษ', 'ลัคนาราศีพฤษภ', 'ลัคนาราศีเมถุน', 
     'ลัคนาราศีกรกฎ', 'ลัคนาราศีสิงห์', 'ลัคนาราศีกันย์', 
@@ -181,7 +211,7 @@ function calculateThaiAscendant(dobStr: string, timeStr: string): string {
     'ลัคนาราศีมังกร', 'ลัคนาราศีกุมภ์', 'ลัคนาราศีมีน'
   ];
   
-  return zodiacNames[ascendantIndex];
+  return zodiacNames[currentSign];
 }
 
 export async function updateMemberProfile(data: any) {
