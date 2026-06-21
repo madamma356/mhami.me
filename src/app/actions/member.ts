@@ -138,6 +138,52 @@ export async function getMemberData() {
   }
 }
 
+function calculateThaiAscendant(dobStr: string, timeStr: string): string {
+  if (!dobStr || !timeStr) return '';
+  
+  const dateParts = dobStr.split('-');
+  if (dateParts.length !== 3) return '';
+  
+  const month = parseInt(dateParts[1]);
+  const day = parseInt(dateParts[2]);
+  
+  let sunSignIndex = 0;
+  if ((month === 4 && day >= 13) || (month === 5 && day <= 14)) sunSignIndex = 0; // เมษ
+  else if ((month === 5 && day >= 15) || (month === 6 && day <= 14)) sunSignIndex = 1; // พฤษภ
+  else if ((month === 6 && day >= 15) || (month === 7 && day <= 14)) sunSignIndex = 2; // เมถุน
+  else if ((month === 7 && day >= 15) || (month === 8 && day <= 15)) sunSignIndex = 3; // กรกฎ
+  else if ((month === 8 && day >= 16) || (month === 9 && day <= 16)) sunSignIndex = 4; // สิงห์
+  else if ((month === 9 && day >= 17) || (month === 10 && day <= 16)) sunSignIndex = 5; // กันย์
+  else if ((month === 10 && day >= 17) || (month === 11 && day <= 15)) sunSignIndex = 6; // ตุลย์
+  else if ((month === 11 && day >= 16) || (month === 12 && day <= 15)) sunSignIndex = 7; // พิจิก
+  else if ((month === 12 && day >= 16) || (month === 1 && day <= 13)) sunSignIndex = 8; // ธนู
+  else if ((month === 1 && day >= 14) || (month === 2 && day <= 12)) sunSignIndex = 9; // มังกร
+  else if ((month === 2 && day >= 13) || (month === 3 && day <= 13)) sunSignIndex = 10; // กุมภ์
+  else if ((month === 3 && day >= 14) || (month === 4 && day <= 12)) sunSignIndex = 11; // มีน
+
+  const timeParts = timeStr.split(':');
+  if (timeParts.length !== 2) return '';
+  const hours = parseInt(timeParts[0]);
+  const minutes = parseInt(timeParts[1]);
+  
+  const totalMinutes = hours * 60 + minutes;
+  let diffMinutes = totalMinutes - 360; // 06:00 AM
+  
+  if (diffMinutes < 0) diffMinutes += 24 * 60;
+  
+  const signsAdvanced = Math.floor(diffMinutes / 120);
+  let ascendantIndex = (sunSignIndex + signsAdvanced) % 12;
+  
+  const zodiacNames = [
+    'ลัคนาราศีเมษ', 'ลัคนาราศีพฤษภ', 'ลัคนาราศีเมถุน', 
+    'ลัคนาราศีกรกฎ', 'ลัคนาราศีสิงห์', 'ลัคนาราศีกันย์', 
+    'ลัคนาราศีตุลย์', 'ลัคนาราศีพิจิก', 'ลัคนาราศีธนู', 
+    'ลัคนาราศีมังกร', 'ลัคนาราศีกุมภ์', 'ลัคนาราศีมีน'
+  ];
+  
+  return zodiacNames[ascendantIndex];
+}
+
 export async function updateMemberProfile(data: any) {
   try {
     const session = await getServerSession(authOptions);
@@ -150,19 +196,39 @@ export async function updateMemberProfile(data: any) {
     }
 
     let userIdToUpdate = sessionId;
+    let existingUser = null;
 
-    // Find the correct User ID
     if (sessionEmail) {
-      const u = await prisma.user.findUnique({ where: { email: sessionEmail } });
-      if (u) userIdToUpdate = u.id;
+      existingUser = await prisma.user.findUnique({ where: { email: sessionEmail } });
+      if (existingUser) userIdToUpdate = existingUser.id;
     }
     
-    if (!userIdToUpdate || userIdToUpdate.startsWith('U')) { // If it's a LINE ID
+    if (!userIdToUpdate || userIdToUpdate.startsWith('U')) {
       const account = await prisma.account.findFirst({
         where: { provider: 'line', providerAccountId: sessionId },
         include: { user: true }
       });
-      if (account) userIdToUpdate = account.user.id;
+      if (account) {
+        userIdToUpdate = account.user.id;
+        existingUser = account.user;
+      }
+    }
+
+    // Check if data is already locked
+    let currentProfile: any = {};
+    if (existingUser?.profileData) {
+      try { currentProfile = JSON.parse(existingUser.profileData); } catch(e) {}
+    }
+
+    // If DOB is already set, prevent overwriting
+    const dob = currentProfile.dob ? currentProfile.dob : data.dob;
+    const birthTime = currentProfile.birthTime ? currentProfile.birthTime : data.birthTime;
+    const province = currentProfile.province ? currentProfile.province : data.province;
+
+    // Calculate ascendant if not already calculated
+    let ascendant = currentProfile.ascendant;
+    if (!ascendant && dob && birthTime) {
+      ascendant = calculateThaiAscendant(dob, birthTime);
     }
 
     await prisma.user.update({
@@ -171,11 +237,11 @@ export async function updateMemberProfile(data: any) {
         name: data.name,
         profileData: JSON.stringify({
           nickname: data.nickname || '',
-          dob: data.dob || '',
-          birthTime: data.birthTime || '',
-          province: data.province || '',
+          dob: dob || '',
+          birthTime: birthTime || '',
+          province: province || '',
           phone: data.phone || '',
-          ascendant: data.ascendant || '' // Ensure we preserve ascendant
+          ascendant: ascendant || ''
         })
       }
     });

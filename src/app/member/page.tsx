@@ -258,6 +258,12 @@ export default function MemberDashboard() {
 
           {isEditing ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div style={{ backgroundColor: 'rgba(255, 177, 66, 0.1)', border: '1px solid #ffb142', padding: '1rem', borderRadius: '0.5rem', marginBottom: '0.5rem' }}>
+                <p style={{ margin: 0, color: '#ffb142', fontSize: '0.85rem', lineHeight: '1.5' }}>
+                  <i className="fas fa-exclamation-triangle" style={{ marginRight: '0.5rem' }}></i>
+                  <strong>ข้อควรระวัง:</strong> กรุณากรอก วัน/เดือน/ปีเกิด, เวลาเกิด และจังหวัดที่เกิด ให้ถูกต้องครบถ้วน เพราะ <u>ไม่สามารถแก้ไขได้ในภายหลัง</u> เพื่อป้องกันการนำดวงผู้อื่นมาสวมรอยนะคะ
+                </p>
+              </div>
               <div>
                 <label style={{ color: 'var(--text-muted)', fontSize: '0.85rem', display: 'block', marginBottom: '0.3rem' }}>ชื่อ-นามสกุล</label>
                 <input 
@@ -281,33 +287,42 @@ export default function MemberDashboard() {
                 />
               </div>
               <div>
-                <label style={{ color: 'var(--text-muted)', fontSize: '0.85rem', display: 'block', marginBottom: '0.3rem' }}>วัน/เดือน/ปีเกิด</label>
+                <label style={{ color: 'var(--text-muted)', fontSize: '0.85rem', display: 'block', marginBottom: '0.3rem' }}>
+                  วัน/เดือน/ปีเกิด {user.dob && <i className="fas fa-lock" style={{ marginLeft: '0.3rem', fontSize: '0.7rem' }}></i>}
+                </label>
                 <input 
                   type="date" 
                   value={editForm.dob} 
                   onChange={(e) => setEditForm({...editForm, dob: e.target.value})}
                   className="cozy-input"
-                  style={{ width: '100%' }}
+                  style={{ width: '100%', opacity: user.dob ? 0.6 : 1, cursor: user.dob ? 'not-allowed' : 'text' }}
+                  disabled={!!user.dob}
                 />
               </div>
               <div>
-                <label style={{ color: 'var(--text-muted)', fontSize: '0.85rem', display: 'block', marginBottom: '0.3rem' }}>เวลาเกิด</label>
+                <label style={{ color: 'var(--text-muted)', fontSize: '0.85rem', display: 'block', marginBottom: '0.3rem' }}>
+                  เวลาเกิด {user.birthTime && <i className="fas fa-lock" style={{ marginLeft: '0.3rem', fontSize: '0.7rem' }}></i>}
+                </label>
                 <input 
                   type="time" 
                   value={editForm.birthTime} 
                   onChange={(e) => setEditForm({...editForm, birthTime: e.target.value})}
                   className="cozy-input"
-                  style={{ width: '100%' }}
+                  style={{ width: '100%', opacity: user.birthTime ? 0.6 : 1, cursor: user.birthTime ? 'not-allowed' : 'text' }}
+                  disabled={!!user.birthTime}
                 />
               </div>
               <div>
-                <label style={{ color: 'var(--text-muted)', fontSize: '0.85rem', display: 'block', marginBottom: '0.3rem' }}>จังหวัดที่เกิด</label>
+                <label style={{ color: 'var(--text-muted)', fontSize: '0.85rem', display: 'block', marginBottom: '0.3rem' }}>
+                  จังหวัดที่เกิด {user.province && <i className="fas fa-lock" style={{ marginLeft: '0.3rem', fontSize: '0.7rem' }}></i>}
+                </label>
                 <input 
                   type="text" 
                   value={editForm.province} 
                   onChange={(e) => setEditForm({...editForm, province: e.target.value})}
                   className="cozy-input"
-                  style={{ width: '100%' }}
+                  style={{ width: '100%', opacity: user.province ? 0.6 : 1, cursor: user.province ? 'not-allowed' : 'text' }}
+                  disabled={!!user.province}
                 />
               </div>
               <div>
