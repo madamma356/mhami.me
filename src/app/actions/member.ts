@@ -13,6 +13,9 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 export async function getMemberData() {
   try {
     const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+      return { user: { name: 'Error: Not authenticated' }, activeOrders: [], pastReadings: [] };
+    }
     const sessionUser = session.user as any;
     const sessionEmail = session.user.email;
     const sessionId = sessionUser.id;
