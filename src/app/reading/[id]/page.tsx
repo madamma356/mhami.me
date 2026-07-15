@@ -278,7 +278,7 @@ export default function ReadingResult({ params }: { params: Promise<{ id: string
             {/* Detailed Readings */}
             <div className="healing-card mockup-card" style={{ padding: '3rem' }}>
               <h3 style={{ color: 'var(--text-main)', marginBottom: '2rem', textAlign: 'center', fontSize: '1.5rem' }}><i className="fas fa-sparkles" style={{ color: 'var(--primary)', marginRight: '0.5rem' }}></i> คำทำนายจากหม่ามี๊</h3>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '3rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '2rem', marginBottom: '3rem' }}>
                 {[
                   { key: 'overall', label: 'ภาพรวมชีวิต', icon: 'fa-globe' },
                   { key: 'obstacles', label: 'จุดติดปัญหา', icon: 'fa-exclamation-circle' },
@@ -295,6 +295,15 @@ export default function ReadingResult({ params }: { params: Promise<{ id: string
                   </div>
                 ))}
               </div>
+
+              {order.prediction.specialMessage && (
+                <div style={{ backgroundColor: 'rgba(214, 180, 124, 0.1)', padding: '2rem', borderRadius: '1rem', border: '1px solid rgba(214, 180, 124, 0.3)', marginBottom: '2rem' }}>
+                  <h4 style={{ color: 'var(--primary)', fontSize: '1.2rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <i className="fas fa-envelope-open-text"></i> ข้อความพิเศษจากหม่ามี๊
+                  </h4>
+                  <p style={{ color: 'var(--text-main)', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>{order.prediction.specialMessage}</p>
+                </div>
+              )}
 
               {order.prediction.quote && (
                 <div style={{ backgroundColor: 'rgba(214, 180, 124, 0.1)', padding: '2rem', borderRadius: '1rem', border: '2px dashed rgba(214, 180, 124, 0.4)', textAlign: 'center' }}>
