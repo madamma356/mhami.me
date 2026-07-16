@@ -1064,6 +1064,15 @@ export default function AdminDashboard() {
                       </div>
                     </div>
                   </div>
+                  <div style={{ marginBottom: '2rem' }}>
+                    <p style={{ color: 'var(--primary)', marginBottom: '0.5rem', fontSize: '1rem', fontWeight: 'bold' }}><i className="fas fa-envelope-open-text" style={{ marginRight: '0.5rem' }}></i>คำทำนายจากใจหม่ามี๊</p>
+                    <textarea 
+                      value={predictionData.specialMessage || ''}
+                      onChange={(e) => setPredictionData({...predictionData, specialMessage: e.target.value})}
+                      placeholder="เช่น เป็นกำลังใจให้นะคะ หม่ามี๊พร้อมซัพพอร์ตเสมอ..."
+                      style={{ width: '100%', height: '150px', backgroundColor: 'rgba(0,0,0,0.3)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '0.5rem', padding: '1rem', color: 'var(--text-main)', fontFamily: 'inherit', resize: 'vertical', outline: 'none', fontSize: '1rem' }}
+                    />
+                  </div>
                   
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem' }}>
                     {[
@@ -1086,15 +1095,6 @@ export default function AdminDashboard() {
                     ))}
                   </div>
 
-                  <div style={{ marginTop: '1.5rem' }}>
-                    <p style={{ color: 'var(--primary)', marginBottom: '0.5rem', fontSize: '0.9rem' }}><i className="fas fa-envelope-open-text" style={{ marginRight: '0.5rem' }}></i>ข้อความพิเศษจากหม่ามี๊ถึงคุณ (ยาวๆ ได้เลย)</p>
-                    <textarea 
-                      value={predictionData.specialMessage || ''}
-                      onChange={(e) => setPredictionData({...predictionData, specialMessage: e.target.value})}
-                      placeholder="เช่น เป็นกำลังใจให้นะคะ หม่ามี๊พร้อมซัพพอร์ตเสมอ..."
-                      style={{ width: '100%', height: '150px', backgroundColor: 'rgba(0,0,0,0.3)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '0.5rem', padding: '0.8rem', color: 'var(--text-main)', fontFamily: 'inherit', resize: 'vertical', outline: 'none', fontSize: '0.9rem' }}
-                    />
-                  </div>
 
                   <div style={{ marginTop: '1.5rem' }}>
                     <p style={{ color: 'var(--primary)', marginBottom: '0.5rem', fontSize: '0.9rem' }}><i className="fas fa-gift" style={{ marginRight: '0.5rem' }}></i>โบนัส: คำคม 1 ประโยค</p>
