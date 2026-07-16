@@ -121,7 +121,7 @@ export default function AdminDashboard() {
   };
 
   const handleCopyToClipboard = () => {
-    let text = `✨ หม่ามี๊ทำนายเสร็จเรียบร้อยแล้วนะคะ คุณ ${selectedOrder.name}\n\n👉 สามารถกดดูผลคำทำนายแบบเต็มๆ และรูปไพ่ที่เปิดได้ที่ลิงก์นี้เลยค่ะ:\nhttp://localhost:3001/reading/${selectedOrder.id.replace('#', '')}`;
+    let text = `✨ หม่ามี๊ทำนายเสร็จเรียบร้อยแล้วนะคะ คุณ ${selectedOrder.name}\n\n👉 สามารถกดดูผลคำทำนายแบบเต็มๆ และรูปไพ่ที่เปิดได้ที่ลิงก์นี้เลยค่ะ:\nhttps://mhami.me/reading/${selectedOrder.id.replace('#', '')}`;
     navigator.clipboard.writeText(text);
     alert('คัดลอกลิงก์สำหรับส่ง LINE เรียบร้อยแล้ว');
   };
