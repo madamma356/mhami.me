@@ -186,7 +186,7 @@ export default function ReadingResult({ params }: { params: Promise<{ id: string
 
                   <div style={{ backgroundColor: 'rgba(214, 180, 124, 0.05)', padding: '1.5rem', borderRadius: '0.8rem', borderLeft: '3px solid var(--primary)' }}>
                     <h3 style={{ color: 'var(--primary)', fontSize: '1.1rem', marginBottom: '1rem' }}><i className="fas fa-comment-dots" style={{ marginRight: '0.5rem' }}></i>คำทำนายจากหม่ามี๊</h3>
-                    <p style={{ color: 'var(--text-muted)', lineHeight: 1.8 }}>{order.prediction[`q${qNum}`]}</p>
+                    <p style={{ color: 'var(--text-muted)', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>{order.prediction[`q${qNum}`]}</p>
                   </div>
                 </div>
               ))}
