@@ -119,10 +119,6 @@ export async function updateAdminPrediction(dbId: string, predictionData: any) {
       }
     });
 
-    await prisma.order.update({
-      where: { id: dbId },
-      data: { status: 'COMPLETED' }
-    });
     return { success: true };
   } catch (error) {
     console.error("Error updating prediction:", error);
@@ -272,11 +268,6 @@ export async function uploadAdminPdf(dbId: string, pdfBase64: string) {
         cards: [],
         prediction: JSON.stringify({ pdfUrl })
       }
-    });
-
-    await prisma.order.update({
-      where: { id: dbId },
-      data: { status: 'COMPLETED' }
     });
 
     return { success: true, pdfUrl };
