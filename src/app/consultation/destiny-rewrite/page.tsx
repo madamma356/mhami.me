@@ -268,10 +268,15 @@ export default function DestinyRewritePage() {
                 <p style={{ color: 'var(--primary)', fontSize: '1.2rem', margin: 0 }}>หมายเลขคำสั่งซื้อ: <span style={{ fontWeight: 'bold' }}>{orderId}</span></p>
               </div>
 
-              <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginBottom: '3rem', lineHeight: '1.6' }}>
-                หม่ามี๊ได้รับข้อมูลดวงชะตาของคุณเรียบร้อยแล้ว<br/>
-                กรุณารอรับคำแนะนำเบอร์มงคลพลิกชีวิตที่ Profile ของคุณภายใน 1-3 วันนะคะ
-              </p>
+              <div style={{ backgroundColor: 'rgba(214, 180, 124, 0.1)', border: '1px solid var(--primary)', borderRadius: '1rem', padding: '1.5rem', marginBottom: '2rem', textAlign: 'center' }}>
+                <p style={{ color: 'var(--primary)', fontSize: '1.2rem', fontWeight: 'bold', margin: '0 0 0.5rem 0' }}>
+                  <i className="fas fa-check-circle" style={{ marginRight: '0.5rem' }}></i> หม่ามี๊ได้รับข้อมูลดวงชะตาของคุณเรียบร้อยแล้ว
+                </p>
+                <p style={{ color: 'var(--text-main)', fontSize: '1.1rem', margin: 0, lineHeight: '1.6' }}>
+                  กรุณารอรับคำแนะนำเบอร์มงคลพลิกชีวิต 1-3 วันนะคะ<br/>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>(คำทำนายจะไม่แสดงในหน้านี้ ระบบจะส่งลิงก์ผลคำทำนายให้ทาง LINE หรือสามารถเข้ามาเช็คได้ที่เมนู Profile ค่ะ)</span>
+                </p>
+              </div>
 
               <div style={{ backgroundColor: 'rgba(26, 24, 22, 0.6)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '1rem', padding: '2rem', marginBottom: '2rem', textAlign: 'left' }}>
                 <h4 style={{ color: 'var(--primary)', marginBottom: '1rem', fontSize: '1.2rem', borderBottom: '1px solid rgba(214, 180, 124, 0.1)', paddingBottom: '0.5rem' }}>
