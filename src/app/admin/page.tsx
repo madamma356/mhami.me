@@ -1201,6 +1201,10 @@ export default function AdminDashboard() {
                 <input type="text" value={editingItem?.title || ''} onChange={e => setEditingItem({ ...editingItem, title: e.target.value })} style={{ width: '100%', padding: '1rem', backgroundColor: 'rgba(0,0,0,0.3)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '0.5rem', color: 'var(--text-main)' }} required />
               </div>
               <div>
+                <label style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '0.5rem', display: 'block' }}>รายละเอียด (Description) รองรับ HTML (เช่น &lt;ul&gt;&lt;li&gt;)</label>
+                <textarea rows={5} value={editingItem?.description || ''} onChange={e => setEditingItem({ ...editingItem, description: e.target.value })} style={{ width: '100%', padding: '1rem', backgroundColor: 'rgba(0,0,0,0.3)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '0.5rem', color: 'var(--text-main)', resize: 'vertical' }}></textarea>
+              </div>
+              <div>
                 <label style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '0.5rem', display: 'block' }}>ประเภท/รหัสบริการ (เช่น PHROM_YAN)</label>
                 <input type="text" value={editingItem?.typeKey || ''} onChange={e => setEditingItem({ ...editingItem, typeKey: e.target.value })} style={{ width: '100%', padding: '1rem', backgroundColor: 'rgba(0,0,0,0.3)', border: '1px solid rgba(214, 180, 124, 0.2)', borderRadius: '0.5rem', color: 'var(--text-main)' }} required />
               </div>
