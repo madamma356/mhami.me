@@ -54,9 +54,9 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
 
         {/* Content */}
         <div 
-          className="blog-content"
+          className="blog-content" 
           style={{ color: 'var(--text-main)', fontSize: '1.1rem', lineHeight: '1.8', fontWeight: 300 }}
-          dangerouslySetInnerHTML={{ __html: blog.content }}
+          dangerouslySetInnerHTML={{ __html: (blog.content || '').replace(/\n/g, '<br/>') }} 
         />
 
         {/* Footer actions */}
