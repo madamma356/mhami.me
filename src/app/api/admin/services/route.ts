@@ -32,6 +32,7 @@ export async function POST(req: Request) {
       data: {
         typeKey: body.typeKey,
         title: body.title,
+        description: body.description,
         price: parseInt(body.price),
         imageUrl: body.imageUrl,
         isActive: body.isActive,
@@ -53,6 +54,7 @@ export async function PUT(req: Request) {
       where: { id: body.id },
       data: {
         title: body.title,
+        description: body.description,
         price: parseInt(body.price),
         imageUrl: body.imageUrl,
         isActive: body.isActive,
