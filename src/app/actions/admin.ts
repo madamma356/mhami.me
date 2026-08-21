@@ -75,7 +75,7 @@ export async function getAdminOrders() {
         id: order.orderNumber, // e.g. ORD-001
         dbId: order.id,
         date: order.createdAt.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' }),
-        name: order.user?.name || 'ลูกค้า',
+        name: customerInfo.name || order.user?.name || 'ลูกค้า',
         lineId: lineId,
         service: serviceName,
         price: `${order.pricePaid}.-`,
