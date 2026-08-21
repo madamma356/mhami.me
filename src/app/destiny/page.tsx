@@ -70,7 +70,7 @@ export default async function DestinyPage() {
                 <p style={{ color: 'var(--primary)', marginBottom: '1.5rem', fontSize: '1.1rem', fontStyle: 'italic' }}>{titleSub}</p>
                 <div 
                   style={{ color: 'var(--text-muted)', marginBottom: '2rem', fontSize: '1rem', lineHeight: '1.8', flex: 1 }}
-                  dangerouslySetInnerHTML={{ __html: service.description || '' }}
+                  dangerouslySetInnerHTML={{ __html: (service.description || '').replace(/\n/g, '<br/>') }}
                 />
                 <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)', padding: '1rem', borderRadius: '1rem', border: '1px solid rgba(214, 180, 124, 0.2)', marginBottom: '1.5rem' }}>
                   {originalPriceMap[service.typeKey] && (

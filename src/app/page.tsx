@@ -97,7 +97,7 @@ export default async function Home() {
                       <p style={{ color: 'var(--primary)', marginBottom: '1rem', fontSize: '1rem', fontStyle: 'italic' }}>{titleSub}</p>
                       <div 
                         style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', fontSize: '0.9rem', lineHeight: '1.6', flex: 1 }}
-                        dangerouslySetInnerHTML={{ __html: service.description || '' }}
+                        dangerouslySetInnerHTML={{ __html: (service.description || '').replace(/\n/g, '<br/>') }}
                       />
                     </Link>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 'auto' }}>
